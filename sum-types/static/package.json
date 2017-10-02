@@ -1,0 +1,19 @@
+{
+  "name": "static",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm t",
+    "test": "ospec"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "static-sum-type": "^0.2.0"
+  },
+  "devDependencies": {
+    "ospec": "^1.3.1",
+    "sanctuary-def": "^0.13.1"
+  }
+}

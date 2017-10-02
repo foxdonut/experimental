@@ -1,0 +1,14 @@
+{
+  "name": "fs-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "jaforbes-lenses.js",
+  "scripts": {
+    "start": "node jaforbes-lenses.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^4.0.2"
+  }
+}
