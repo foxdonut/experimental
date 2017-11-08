@@ -1,30 +1,30 @@
 /* credit: James Forbes @james_a_forbes */
 const o = require('ospec')
 const $ = require('sanctuary-def')
-const { 
+const {
   fold: devFold
-  , StaticSumTypeError 
-} = require('static-sum-type/fold/dev')(function(e){
+  , StaticSumTypeError
+} = require('static-sum-type/modules/fold/dev')(function(e){
   return e
 })
 
-const PredicatedLib = require('static-sum-type/predicated/dev')
+const PredicatedLib = require('static-sum-type/modules/predicated/dev')
 
-const { fold: prodCata } = require('static-sum-type/fold/prod')()
+const { fold: prodCata } = require('static-sum-type/modules/fold/prod')()
 
 class Maybe {
   static Just(x) {
-    return { 
+    return {
       value: x
       , case: Maybe.Just
       , type: Maybe
-    } 
+    }
   }
-  static Nothing() { 
-    return { 
-      case: Maybe.Nothing 
+  static Nothing() {
+    return {
+      case: Maybe.Nothing
       , type: Maybe
-    } 
+    }
   }
 }
 
@@ -37,30 +37,30 @@ class Loadable {
       , toString(){
         return 'Loaded('+x+')'
       }
-    } 
+    }
   }
-  static Loading() { 
-    return { 
+  static Loading() {
+    return {
       of: Loadable.Loading
       , type: Loadable
       , toString(){
         return 'Loading()'
       }
-    } 
+    }
   }
 }
 
 var Maybe2 ={
   name: 'Maybe'
   ,Just(x){
-    return { 
+    return {
       value: x
       , case: Maybe2.Just
       , type: Maybe2
     }
   }
   ,Nothing(){
-    return { 
+    return {
       case: Maybe2.Nothing
       , type: Maybe2
     }
@@ -79,7 +79,7 @@ o('static-sum-type', function(){
     ,Nothing: () => 0
   })
 
-  o( 
+  o(
     maybeToNum(Maybe.Just('hi'))
   ).equals(
     1
@@ -88,87 +88,87 @@ o('static-sum-type', function(){
   )
 
   o(
-    maybeToNum(Maybe2.Just('hey')) 
+    maybeToNum(Maybe2.Just('hey'))
   ).equals(
-    1 
+    1
   )(
     'fold can fold different types that meet the spec'
   )
 
   o(
-    maybeToNum(Loadable.Loaded('whatever')).case 
+    maybeToNum(Loadable.Loaded('whatever')).case
   ).equals(
-    StaticSumTypeError.InstanceWrongType 
+    StaticSumTypeError.InstanceWrongType
   )(
     'Fold identifies when a value is of the wrong type'
   )
 
   o(
-    devFold(Maybe, 0).case 
+    devFold(Maybe, 0).case
   ).equals(
-    StaticSumTypeError.TooManyArguments 
+    StaticSumTypeError.TooManyArguments
   )(
     'fold identifies when there are too many arguments level:0'
   )
 
   o(
-    devFold(Maybe)({ Just: () => 1, Nothing: () => 0 }, 1).case 
+    devFold(Maybe)({ Just: () => 1, Nothing: () => 0 }, 1).case
   ).equals(
-    StaticSumTypeError.TooManyArguments 
+    StaticSumTypeError.TooManyArguments
   )(
     'fold identifies when there are too many arguments level:1'
   )
 
   o(
-    devFold(Maybe)({ Just: () => 1, Nothing: () => 0 })( Maybe.Just(1), 1 ).case 
+    devFold(Maybe)({ Just: () => 1, Nothing: () => 0 })( Maybe.Just(1), 1 ).case
   ).equals(
-    StaticSumTypeError.TooManyArguments 
+    StaticSumTypeError.TooManyArguments
   )(
     'fold identifies when there are too many arguments level:2'
   )
 
   o(
-    maybeToNum( null ).case 
+    maybeToNum( null ).case
   ).equals(
-    StaticSumTypeError.InstanceNull 
+    StaticSumTypeError.InstanceNull
   )(
     'fold identifies when a value is null'
   )
 
   o(
-    maybeToNum({ type: Maybe ,case: Loadable.Loaded ,value: 1 }).case 
+    maybeToNum({ type: Maybe ,case: Loadable.Loaded ,value: 1 }).case
   ).equals(
-    StaticSumTypeError.InstanceShapeInvalid 
+    StaticSumTypeError.InstanceShapeInvalid
   )(
     'fold identifies when a instance has the wrong case key'
   )
 
   o(
-    foldMaybe({ Just: () => 1 }).case 
+    foldMaybe({ Just: () => 1 }).case
   ).equals(
-    StaticSumTypeError.TooFewCases 
+    StaticSumTypeError.TooFewCases
   )(
     'fold detects when there are too few cases provided'
   )
 
   o(
-    foldMaybe({ Just: () => 1 ,Nothing: () => 1 ,Left: () => 1 }).case 
+    foldMaybe({ Just: () => 1 ,Nothing: () => 1 ,Left: () => 1 }).case
   ).equals(
-    StaticSumTypeError.TooManyCases 
+    StaticSumTypeError.TooManyCases
   )(
     'fold detects when there are too few many provided'
   )
 
   o(
-    prodCata( Loadable)({ Loaded: () => 1 })( Loadable.Loaded(1)) 
+    prodCata( Loadable)({ Loaded: () => 1 })( Loadable.Loaded(1))
   ).equals(
-    1 
+    1
   )(
     'prodCata ignores errors and blindy tries to do its job'
   )
 
-  const SumTypePred = PredicatedLib( 
-    x => x != null && x.toString() 
+  const SumTypePred = PredicatedLib(
+    x => x != null && x.toString()
     , e => {
       throw new Error(e.message)
     }

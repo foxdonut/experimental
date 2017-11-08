@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build",
+    "preserveConstEnums": false,
+    "strictNullChecks": true
+  }
+}
