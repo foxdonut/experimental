@@ -252,3 +252,41 @@ const { color, ...remaining } = styles;
 
 const shallowCopy = { ...styles };
 
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
+const todo: Todo = {
+  id: 42,
+  text: "use TS",
+  completed: false
+};
+
+function prop<T, K extends keyof T>(obj: T, prop: K): T[K] {
+  return obj[prop];
+}
+
+type TodoId = Todo["id"];
+
+const id = prop(todo, "id");
+const text = prop(todo, "text");
+const completed = prop(todo, "completed");
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+const origin: Point = { x: 0, y: 0 };
+
+type ReadonlyPoint = Readonly<Point>;
+
+const ppoint: Partial<Point> = { x: 42 };
+
+type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};
+
+const npoint: Nullable<Point> = { x: 5, y: null };
