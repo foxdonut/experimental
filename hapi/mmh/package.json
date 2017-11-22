@@ -1,0 +1,28 @@
+{
+  "name": "mmh",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "makemehapi": "^6.0.0",
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "domvm": "^3.2.4",
+    "handlebars": "^4.0.11",
+    "hapi": "^16",
+    "inert": "^4",
+    "joi": "^13.0.2",
+    "vision": "^4.1.1"
+  }
+}
