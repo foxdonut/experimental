@@ -21,12 +21,15 @@ server.route([
       validate: {
         payload: Joi.object({
           isGuest: Joi.boolean().required(),
-          username: Joi.string().when("isGuest", { is: false, then: Joi.required() }),
+          username: Joi.string().when("isGuest", {
+            is: false,
+            then: Joi.required()
+          }),
           accessToken: Joi.string().alphanum(),
           password: Joi.string().alphanum()
         })
-        .options({ allowUnknown: true })
-        .xor("accessToken", "password")
+          .options({ allowUnknown: true })
+          .xor("accessToken", "password")
       }
     }
   }
@@ -38,4 +41,3 @@ server.start(function(err) {
   }
   console.log("Server running on", server.info.uri);
 });
-
