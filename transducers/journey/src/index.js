@@ -2,7 +2,7 @@ const timeIt = (desc, fn) => {
   console.time(desc);
   const result = fn();
   if (result.length) {
-    const max = result.length > 10 ? 10 : result.length;
+    const max = result.length > 20 ? 20 : result.length;
     const slice = result.slice(0, max);
     console.log(JSON.stringify(slice));
   }
@@ -65,6 +65,8 @@ const filter2 = pred => (acc, next) => {
 timeIt("map map filter reducers", () => arrMil.
   reduce(map2(decr), []).reduce(map2(triple), []).reduce(filter2(isEven), []));
 
+// fn => (acc, next) => (acc, next)
+// fn => reducer => reducer
 const map3 = fn => reducer => (acc, next) => reducer(acc, fn(next));
 const filter3 = pred => reducer => (acc, next) => pred(next) ? reducer(acc, next) : acc;
 
@@ -82,9 +84,19 @@ const compose3 = (f, g, h) => x => f(g(h(x)));
 timeIt("map map filter transducers compose", () => arrMil.
   reduce(compose3(map3(decr), map3(triple), filter3(isEven))(push), []));
 
-/*
-map3(decr) => reducer => (acc, next) => ...
-filter3(isEven) => reducer => (acc, next) => ...
-compose(f, g) => x => f(g(x));
-compose(reducer => (acc, next), reducer => (acc, next)) => reducer =>
-*/
+const reduce = (reducer, seed, init) => init.reduce(reducer, seed);
+
+//const mapcat3 = fn => reducer => (acc, next) => reduce(reducer, acc, fn(next));
+const mapcat3 = fn => reducer => (acc, next) => fn(next).reduce(reducer, acc);
+
+const reverse = a => {
+  const arr = Array.prototype.slice.call(a, 0);
+  arr.reverse();
+  return arr;
+};
+
+const arrArr = [[3,2,1],[6,5,4],[9,8,7],[[3],[2],[1]]];
+
+timeIt("map", () => arrArr.reduce(map3(reverse)(push), []));
+timeIt("mapcat", () => arrArr.reduce(mapcat3(reverse)(push), []));
+// [1,2,3,4,5,6]
