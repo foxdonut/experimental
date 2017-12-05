@@ -6,6 +6,7 @@ const domvm = require("domvm/dist/server/domvm.server");
 
 const render = require("../build/generated-domvm").render;
 
+/*
 const createJsx = function(h) {
   return function(type, props) {
     const args = [type, props];
@@ -19,6 +20,8 @@ const createJsx = function(h) {
 };
 
 global.jsx = createJsx(domvm.defineElement);
+*/
+global.jsx = domvm.defineElementSpread;
 
 const View = () => (vm, data) => render(data);
 /*
