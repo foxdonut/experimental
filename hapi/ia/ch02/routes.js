@@ -17,6 +17,11 @@ module.exports =
     , config: { auth: "api" }
     , handler: Recipes.create
     }
+  , { method: "POST"
+    , path: "/api/recipes/{id}/star"
+    , config: { auth: "api" }
+    , handler: Recipes.star
+    }
   , { method: "GET"
     , path: "/api/dx"
     , handler: Dx.findSome

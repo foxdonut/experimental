@@ -49,3 +49,29 @@ exports.create = function(request, reply) {
   });
 };
 
+exports.star = function(request, reply) {
+  const id = request.params.id;
+  const sqlRead = "SELECT stars FROM recipes WHERE id = ?";
+
+  this.db.get(sqlRead, [id], (err, row) => {
+    if (err) {
+      throw err;
+    }
+
+    if (row) {
+      const newStars = row.stars + 1;
+
+      const sqlWrite = "UPDATE recipes SET stars = ? WHERE id = ?";
+
+      this.db.run(sqlWrite, [newStars, id], err => {
+        if (err) {
+          throw err;
+        }
+        return reply({ status: "OK" });
+      });
+    }
+    else {
+      return reply("Recipe not found").code(404);
+    }
+  });
+};
