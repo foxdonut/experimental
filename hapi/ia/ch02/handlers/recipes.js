@@ -28,3 +28,24 @@ exports.findOne = function(request, reply) {
   });
 };
 
+exports.create = function(request, reply) {
+  const sql = "INSERT INTO recipes (name, cooking_time, prep_time, serves, cuisine, ingredients, "
+    + "directions, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+  this.db.run(sql, [
+    request.payload.name,
+    request.payload.cooking_time,
+    request.payload.prep_time,
+    request.payload.serves,
+    request.payload.cuisine,
+    request.payload.ingredients,
+    request.payload.directions,
+    request.auth.credentials.id
+  ], err => {
+    if (err) {
+      throw err;
+    }
+    reply({ status: "OK" });
+  });
+};
+
