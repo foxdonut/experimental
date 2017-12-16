@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "domvm": "^3.2.4",
+    "domvm": "^3.2.5",
     "hapi": "^16.6.2",
     "hapi-auth-bearer-token": "^5.1.0",
     "inert": "^4.2.1",

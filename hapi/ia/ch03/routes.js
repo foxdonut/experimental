@@ -23,6 +23,10 @@ module.exports =
     , handler: Recipes.star
     }
   , { method: "GET"
+    , path: "/"
+    , handler: Pages.home
+    }
+  , { method: "GET"
     , path: "/{filename*}"
     , handler: Pages.publicDir
     }

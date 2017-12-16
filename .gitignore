@@ -59,3 +59,4 @@ typings/
 
 # My additions
 build
+package-lock.json
