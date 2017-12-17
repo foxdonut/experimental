@@ -4,6 +4,7 @@ const compose = require("crocks/helpers/compose");
 const prop = require("crocks/Maybe/prop");
 const option = require("crocks/pointfree/option");
 const mapProps = require("crocks/helpers/mapProps");
+const constant = require("crocks/combinators/constant");
 
 // State s a
 // (s -> (a, s))
@@ -47,4 +48,11 @@ console.log(State.get(prop("fries")).map(option(0)).execWith(burgers));
 console.log(State.put("Grand Canyon").execWith("Evergreen"));
 
 console.log(State.modify(mapProps({ bubbles: add(1) })).execWith({ bubbles: 41 }));
+
+const addToResult = n => State.get(add(n));
+const addToState = r => State.modify(add(1)).map(constant(r));
+
+const compute = n => State.of(n).chain(addToResult).chain(addToState);
+
+console.log(compute(10).runWith(2));
 
