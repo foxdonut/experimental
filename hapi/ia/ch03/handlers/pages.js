@@ -1,6 +1,7 @@
 "use strict";
 
-const view = require("../domvm");
+const Recipes = require("../recipes");
+const View = require("../domvm");
 
 exports.publicDir = {
   directory: {
@@ -9,28 +10,32 @@ exports.publicDir = {
 };
 
 exports.home = function(request, reply) {
-  const recipes = [{
-    id: 1,
-    name: "Silicate soup",
-    cuisine: "Martian",
-    stars: 100,
-    serves: 1,
-    prep_time: "2 hours",
-    cooking_time: "12 minutes"
-  }, {
-    id: 2,
-    name: "Methane trifle",
-    cuisine: "Neptunian",
-    stars: 200,
-    serves: 1,
-    prep_time: "1 hour",
-    cooking_time: "24 minutes"
-  }];
-
-  view({ recipes: recipes }, (err, doc) => {
+  Recipes.findAll(this.db, request.query, (err, recipes) => {
     if (err) {
       throw err;
     }
-    reply(doc);
+    View.home({ recipes: recipes }, (err, doc) => {
+      if (err) {
+        throw err;
+      }
+      reply(doc);
+    });
   });
+};
+
+exports.detail = function(request, reply) {
+  Recipes.findOne(this.db, request.params.id, (err, recipe) => {
+    if (err) {
+      throw err;
+    }
+    if (recipe) {
+      View.detail({ recipe: recipe }, (err, doc) => {
+        if (err) {
+          throw err;
+        }
+        reply(doc);
+      });
+    }
+    return reply("Recipe not found").code(404);
+  })
 };

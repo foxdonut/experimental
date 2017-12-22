@@ -1,7 +1,7 @@
 const domvm = require("domvm");
 const el = domvm.defineElement;
 
-module.exports = model =>
+exports.home = model =>
   el("body", [
     el("header", [
       el("a#logo", { href: "/" }, [ el("img", { src: "/images/logo.png"}) ]),
@@ -17,3 +17,6 @@ module.exports = model =>
     ),
     el("footer", {".innerHTML": "<p>&copy; 2017 DinDin</p>" })
   ]);
+
+exports.detail = model =>
+  null;

@@ -1,14 +1,9 @@
 "use strict";
 
-exports.findAll = function(request, reply) {
-  let sql = "select * from recipes";
-  const params = [];
+const Recipes = require("../recipes");
 
-  if (request.query.cuisine) {
-    sql += " where cuisine = ?";
-    params.push(request.query.cuisine);
-  }
-  this.db.all(sql, params, (err, rows) => {
+exports.findAll = function(request, reply) {
+  Recipes.findAll(this.db, request.query, (err, rows) => {
     if (err) {
       throw err;
     }
@@ -17,7 +12,7 @@ exports.findAll = function(request, reply) {
 };
 
 exports.findOne = function(request, reply) {
-  this.db.get("select * from recipes where id = ?", [request.params.id], (err, row) => {
+  Recipes.findOne(this.db, request.params.id, (err, row) => {
     if (err) {
       throw err;
     }
@@ -29,19 +24,7 @@ exports.findOne = function(request, reply) {
 };
 
 exports.create = function(request, reply) {
-  const sql = "INSERT INTO recipes (name, cooking_time, prep_time, serves, cuisine, ingredients, "
-    + "directions, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-  this.db.run(sql, [
-    request.payload.name,
-    request.payload.cooking_time,
-    request.payload.prep_time,
-    request.payload.serves,
-    request.payload.cuisine,
-    request.payload.ingredients,
-    request.payload.directions,
-    request.auth.credentials.id
-  ], err => {
+  Recipes.create(this.db, request.payload, err => {
     if (err) {
       throw err;
     }
@@ -50,25 +33,13 @@ exports.create = function(request, reply) {
 };
 
 exports.star = function(request, reply) {
-  const id = request.params.id;
-  const sqlRead = "SELECT stars FROM recipes WHERE id = ?";
-
-  this.db.get(sqlRead, [id], (err, row) => {
+  Recipes.star(this.db, request.params.id, (err, row) => {
     if (err) {
       throw err;
     }
 
     if (row) {
-      const newStars = row.stars + 1;
-
-      const sqlWrite = "UPDATE recipes SET stars = ? WHERE id = ?";
-
-      this.db.run(sqlWrite, [newStars, id], err => {
-        if (err) {
-          throw err;
-        }
-        return reply({ status: "OK" });
-      });
+      return reply({ status: "OK" });
     }
     else {
       return reply("Recipe not found").code(404);
