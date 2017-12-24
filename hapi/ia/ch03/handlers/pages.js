@@ -1,7 +1,9 @@
 "use strict";
 
 const Recipes = require("../recipes");
-const View = require("../domvm");
+const render = require("../domvm");
+const Home = require("../domvm/home");
+const Detail = require("../domvm/detail");
 
 exports.publicDir = {
   directory: {
@@ -14,7 +16,7 @@ exports.home = function(request, reply) {
     if (err) {
       throw err;
     }
-    View.home({ recipes: recipes }, (err, doc) => {
+    render(Home({ recipes: recipes }), (err, doc) => {
       if (err) {
         throw err;
       }
@@ -29,13 +31,15 @@ exports.detail = function(request, reply) {
       throw err;
     }
     if (recipe) {
-      View.detail({ recipe: recipe }, (err, doc) => {
+      render(Detail({ recipe: recipe }), (err, doc) => {
         if (err) {
           throw err;
         }
-        reply(doc);
+        return reply(doc);
       });
     }
-    return reply("Recipe not found").code(404);
+    else {
+      return reply("Recipe not found").code(404);
+    }
   })
 };

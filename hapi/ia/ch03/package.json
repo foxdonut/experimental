@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "crocks": "^0.8.2",
     "domvm": "^3.2.5",
     "hapi": "^16.6.2",
     "hapi-auth-bearer-token": "^5.1.0",

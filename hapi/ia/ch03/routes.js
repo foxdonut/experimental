@@ -27,6 +27,10 @@ module.exports =
     , handler: Pages.home
     }
   , { method: "GET"
+    , path: "/recipes/{id}"
+    , handler: Pages.detail
+    }
+  , { method: "GET"
     , path: "/{filename*}"
     , handler: Pages.publicDir
     }
