@@ -4,7 +4,8 @@ const Async = require("crocks/Async");
 const Maybe = require("crocks/Maybe");
 const Result = require("crocks/Result");
 
-const toMaybe = value => value ? Maybe.Just(value) : Maybe.Nothing();
+const toMaybe = value => (value === null || value === undefined) ?
+  Maybe.Nothing() : Maybe.Just(value);
 
 /*
 exports.findAll = function(db, query, cb) {
@@ -27,7 +28,7 @@ exports.findAll = function(db, query) {
     sql += " where cuisine = ?";
     params.push(query.cuisine);
   }
-  return Async.fromNode(db.all)(sql, params);
+  return Async.fromNode(db.all, db)(sql, params);
 };
 
 /*

@@ -12,7 +12,7 @@ exports.publicDir = {
   }
 };
 
-const throwFn = err => { throw err };
+const throwFn = err => { throw err; };
 
 /*
 exports.home = function(request, reply) {
@@ -58,20 +58,11 @@ exports.detail = function(request, reply) {
 */
 
 exports.detail = function(request, reply) {
-  Recipes.findOne(this.db, request.params.id, (err, recipe) => {
-    if (err) {
-      throw err;
-    }
-    if (recipe) {
-      render(Detail({ recipe: recipe }), (err, doc) => {
-        if (err) {
-          throw err;
-        }
-        return reply(doc);
-      });
-    }
-    else {
-      return reply("Recipe not found").code(404);
-    }
-  })
-};
+  Recipes.findOne(this.db, request.params.id).fork(throwFn, maybeRecipe =>
+    maybeRecipe.either(
+      () => reply("Recipe not found").code(404),
+      recipe => render(Detail({ recipe: recipe })).fork(throwFn, reply)
+    )
+  );
+}
+
