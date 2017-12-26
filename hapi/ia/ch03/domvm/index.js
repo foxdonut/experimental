@@ -22,7 +22,7 @@ module.exports = function(view, cb) {
 */
 
 module.exports = view =>
-  Async.fromNode(fs.readFile)(Path.join(__dirname, "../public/index.html"), "utf8")
+  Async.fromNode(fs.readFile, fs)(Path.join(__dirname, "../public/index.html"), "utf8")
     .map(data => {
       const View = () => () => view;
       const html = () => domvm.createView(View).html();

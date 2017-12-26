@@ -38,7 +38,7 @@ exports.findOne = function(db, id, cb) {
 */
 
 exports.findOne = function(db, id) {
-  return Async.fromNode(db.get)("select * from recipes where id = ?", [id])
+  return Async.fromNode(db.get, db)("select * from recipes where id = ?", [id])
     .map(toMaybe);
 };
 
@@ -64,7 +64,7 @@ exports.create = function(db, payload) {
   const sql = "INSERT INTO recipes (name, cooking_time, prep_time, serves, cuisine, ingredients, "
     + "directions, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-  return Async.fromNode(db.run)(sql, [
+  return Async.fromNode(db.run, db)(sql, [
     payload.name,
     payload.cooking_time,
     payload.prep_time,
@@ -100,13 +100,13 @@ exports.star = function(db, id, cb) {
 exports.star = function(db, id) {
   const sqlRead = "SELECT stars FROM recipes WHERE id = ?";
 
-  return Async.fromNode(db.get)(sqlRead, [id]).chain(row => {
+  return Async.fromNode(db.get, db)(sqlRead, [id]).chain(row => {
     if (row) {
       const newStars = row.stars + 1;
 
       const sqlWrite = "UPDATE recipes SET stars = ? WHERE id = ?";
 
-      return Async.fromNode(db.run)(sqlWrite, [newStars, id]).map(Result.Ok);
+      return Async.fromNode(db.run, db)(sqlWrite, [newStars, id]).map(Result.Ok);
     }
     else {
       return Async.of(Result.Err());
