@@ -4,8 +4,11 @@ const Async = require("crocks/Async");
 const Maybe = require("crocks/Maybe");
 const Result = require("crocks/Result");
 
-const toMaybe = value => (value === null || value === undefined) ?
-  Maybe.Nothing() : Maybe.Just(value);
+const isNil = require("crocks/predicates/isNil");
+const not = require("crocks/logic/not");
+const safe = require("crocks/Maybe/safe");
+
+const toMaybe = safe(not(isNil));
 
 /*
 exports.findAll = function(db, query, cb) {
