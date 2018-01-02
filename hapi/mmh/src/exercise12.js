@@ -11,10 +11,11 @@ server.connection({
 });
 
 server.state("session", {
-  ttl: 10,
+  ttl: 1000 * 60 * 60 * 2,
   path: "/",
   encoding: "base64json",
-  domain: "localhost"
+  domain: "localhost",
+  isSecure: false
 });
 
 server.route([
