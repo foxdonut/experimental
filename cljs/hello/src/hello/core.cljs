@@ -2,6 +2,7 @@
 
 (.write js/document "<div>Hello ClojureScript</div>")
 
-;(enable-console.print!)
+(enable-console-print!)
 
-;(println "Hello ClojureScript")
+(println "Hello ClojureScript")
+
