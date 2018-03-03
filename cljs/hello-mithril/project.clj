@@ -36,9 +36,13 @@
         :source-paths ["src"]
         :compiler {
           :main "hello-mithril.core"
-          :output-to "build/bundle-dev.js"
-          :optimizations :advanced
+          :output-to "build/bundle-prod.js"
+          :optimizations :simple
           :pretty-print false
+          :install-deps true
+          :npm-deps {
+            :mithril "1.1.6"
+          }
         }
       }
     }
