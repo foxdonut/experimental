@@ -1,0 +1,20 @@
+{
+  :dependencies [
+  ]
+
+  :source-paths ["src"]
+
+  :builds {
+    :app {
+      :target :browser
+      :output-dir "build"
+      :asset-path "/build"
+      :modules {
+        :main {
+          :entries [hello-mithril-meiosis.core]
+        }
+      }
+    }
+  }
+}
+

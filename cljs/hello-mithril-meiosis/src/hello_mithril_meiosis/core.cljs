@@ -1,8 +1,6 @@
 (ns hello-mithril-meiosis.core
-  ;(:require [mithril] [mithril-stream]]))
-  (:require [mithril] [flyd :refer [scan stream]]))
-
-(def m js/m)
+  ;(:require ["mithril" :as m] ["mithril-stream"]))
+  (:require ["mithril" :as m] ["flyd" :as flyd]))
 
 (defn create-view [update-stream]
   (let [increase (fn [amount] (fn [event] (update-stream amount)))]
@@ -12,12 +10,10 @@
       (m "button" { "onclick" (increase -1) } "-1")
     ))))
 
-(def model 0)
-;(def update-stream (m.stream))
-(def update-stream (stream))
+(def update-stream (.stream flyd))
 (def view (create-view update-stream))
 
-;(def models (js/window.m.stream.scan (fn [model value] (+ model value)) model update-stream))
-(def models (scan (fn [model value] (+ model value)) model update-stream))
+(def models (.scan flyd (fn [model value] (+ model value)) 0 update-stream))
 
-(.map models (fn [model] (m.render js/app (view model))))
+(.map models (fn [model] (.render m js/app (view model))))
+

@@ -61,3 +61,4 @@ typings/
 build
 package-lock.json
 target
+.shadow-cljs
