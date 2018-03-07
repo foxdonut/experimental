@@ -1,9 +1,5 @@
-;global m
-
 (def create-view (update)
-  ;(var increase (lambda (amount) (lambda (event) (update amount))))
   (var increase (#(amount) (#(event) (update amount))))
-  ;(lambda (model) [ 
   (#(model) [ 
     (m "div" "Counter: " model)
     (m "button" {onclick (increase  1)} "+1")
@@ -12,9 +8,6 @@
 
 (var update (m.stream))
 (var view (create-view update))
-(var model 0)
-;(var models (m.stream.scan (lambda (model value) (+ model value)) model update))
-(var models (m.stream.scan (#(model value) (+ model value)) model update))
-;(models.map (lambda (model) (m.render app (view model))))
+(var models (m.stream.scan (#(model value) (+ model value)) 0 update))
 (models.map (#(model) (m.render app (view model))))
 
