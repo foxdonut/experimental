@@ -553,3 +553,42 @@ module.exports = {
 	,pipeWith
 }
 
+// Queries!
+/*
+The top 3 functions would be provided utils, the last 3 is usage code
+so queries are like lenses that assume you want to update, and because we're assuming that we avoid a lot of indirection by having to use functors ( R.over ). Instead we just call the query directly.
+*/
+
+const o = f => g => x => f(g(x))
+const $prop = k => f => o => 
+  Object.assign({}, o, { [k]: f(o[k]) })
+
+const $stream = f => s => {
+  s( f(s() ))
+  return s
+}
+const $abc = o ( $stream ) ( $prop ('abc') )
+const $xyz = o ( $abc ) ( $prop ('xyz') )
+
+
+$xyz ( x => x + 1 ) (s)
+
+// So, to get the nested value from your stream, we'd use.
+
+$xyz(view) (s)
+
+// and that will return whatever s().abc.xyz's value is
+// view is a visitor function that instead of transforming the value, it just returns it
+// it's literally this:
+
+const view = f => o => {
+  var result;
+  f( ( x ) => {
+    result = x  
+    return x
+  } ) (o)
+  return result
+}
+
+// it basically cheats the system, instead of transforming x, it stores it, and then returns it
+
