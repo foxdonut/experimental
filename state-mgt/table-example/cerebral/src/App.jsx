@@ -1,7 +1,8 @@
 import React from "react";
-import { Compute, Controller, Module, connect } from "cerebral";
-import { set } from "cerebral/operators";
+import { Compute, Controller, Module } from "cerebral";
+import { push, set } from "cerebral/operators";
 import { signal, state } from "cerebral/tags";
+import { connect } from "@cerebral/react";
 
 const Row = (props) => {
   return (<tr>
@@ -59,38 +60,29 @@ const Table = connect(
   }
 );
 
-const clearList = () => {
-  this.props.store.clearList();
-};
-
-const addEmployee = () => {
-  const name = prompt("The name:");
-  const salary = parseInt(prompt("The salary:"), 10) || 0;
-  this.props.store.pushEmployee({ name, salary });
-};
-
 const Controls = connect(
   {
     clearList: signal`clearList`,
     addEmployee: signal`addEmployee`
   },
   function({ clearList, addEmployee }) {
+    const getEmployeeInfo = () => {
+      const name = prompt("The name:");
+      const salary = parseInt(prompt("The salary:"), 10) || 0;
+      addEmployee({ name, salary });
+    };
     return (
       <div className="controls">
         <button onClick={() => clearList()}>clear table</button>
-        <button onClick={() => addEmployee()}>add record</button>
+        <button onClick={() => getEmployeeInfo()}>add record</button>
       </div>
     );
   }
 );
 
-const actions = {
-  addEmployee: ({ state }) => state.push("employeesList", { name, salary })
-};
-
 const sequences = {
   clearList: set(state`employeesList`, []),
-  addEmployee: actions.addEmployee
+  addEmployee: ({ state, props }) => { state.push("employeesList", props); }
 };
 
 const app = Module({
@@ -106,7 +98,7 @@ const app = Module({
   }
 });
 
-export const App = connect(function() {
+export const App = connect({}, function() {
   return (
     <div>
       <h1>Cerebral Table</h1>
