@@ -1,6 +1,6 @@
 import React from "react";
 import { Compute, Controller, Module } from "cerebral";
-import { push, set } from "cerebral/operators";
+import { set } from "cerebral/operators";
 import { signal, state } from "cerebral/tags";
 import { connect } from "@cerebral/react";
 
@@ -38,12 +38,7 @@ const Table = connect(
             </tr>
           </thead>
           <tbody>
-            {employeesList.map((e, i) =>
-              <Row
-                key={i}
-                data={e}
-              />
-            )}
+            {employeesList.map((e, i) => <Row key={i} data={e} />)}
           </tbody>
           <tfoot>
             <tr>

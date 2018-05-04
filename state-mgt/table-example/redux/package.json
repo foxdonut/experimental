@@ -1,7 +1,7 @@
 {
-  "name": "mobx-table",
+  "name": "redux-table",
   "version": "1.0.0",
-  "description": "mobx experimentation",
+  "description": "redux experimentation",
   "main": "src/index.jsx",
   "scripts": {
     "start": "static-server -p 7000",
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/foxdonut/experimental.git"
   },
   "keywords": [
-    "mobx"
+    "redux"
   ],
   "author": "js-craft",
   "license": "ISC",
@@ -22,10 +22,10 @@
   },
   "homepage": "https://github.com/foxdonut/experimental#readme",
   "dependencies": {
-    "mobx": "^4.2.0",
-    "mobx-react": "^5.1.2",
     "react": "^16.3.2",
-    "react-dom": "^16.3.2"
+    "react-dom": "^16.3.2",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

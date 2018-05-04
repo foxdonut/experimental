@@ -1,44 +1,41 @@
-import React, { Component } from "react";
-import { decorate, observable, configure, action, computed } from "mobx";
-import { observer } from "mobx-react";
+import React from "react";
+import { createStore } from "redux";
+import { connect } from "react-redux";
 
-configure({ enforceActions: true });
+const actions = {
+  clearList: () => ({ type: "CLEAR_LIST" }),
+  addEmployee: employee => ({ type: "ADD_EMPLOYEE", employee })
+};
 
-class Store {
-  constructor() {
-    this.employeesList = [
-      { name: "John Doe", salary: 150 },
-      { name: "Richard Roe", salary: 225 },
-    ];
+const initialState = {
+  employeesList: [
+    { name: "John Doe", salary: 150 },
+    { name: "Richard Roe", salary: 225 },
+  ]
+};
+
+function app(state = initialState, action) {
+  if (action.type === "CLEAR_LIST") {
+    return Object.assign({}, state, { employeesList: [] });
   }
-
-  clearList() {
-    this.employeesList = [];
+  else if (action.type === "ADD_EMPLOYEE") {
+    return Object.assign({}, state,
+      { employeesList: state.employeesList.concat([action.employee]) });
   }
-
-  pushEmployee(e) {
-    this.employeesList.push(e);
-  }
-
-  get totalSum() {
-    let sum = 0;
-    this.employeesList.map(e => sum = sum + e.salary);
-    return sum;
-  }
-
-  get highEarnersCount() {
-    return this.employeesList.filter(e => e.salary > 500).length;
-  }
+  return state;
 }
 
-decorate(Store, {
-  employeesList: observable,
-  clearList: action,
-  pushEmployee: action,
-  totalSum: computed
-});
+export const store = createStore(app);
 
-const appStore = new Store();
+function totalSum(employeesList) {
+  let sum = 0;
+  employeesList.map(e => sum = sum + e.salary);
+  return sum;
+}
+
+function highEarnersCount(employeesList) {
+  return employeesList.filter(e => e.salary > 500).length;
+}
 
 const Row = (props) => {
   return (<tr>
@@ -47,11 +44,14 @@ const Row = (props) => {
   </tr>);
 };
 
-
-const Table = observer(class extends Component {
-  render() {
-    const { store } = this.props;
-    return (<div>
+const Table = connect(
+    state => ({
+      employeesList: state.employeesList,
+      totalSum: totalSum(state.employeesList),
+      highEarnersCount: highEarnersCount(state.employeesList)
+    })
+  )(({ employeesList, totalSum, highEarnersCount }) => (
+    <div>
       <table>
         <thead>
           <tr>
@@ -60,56 +60,45 @@ const Table = observer(class extends Component {
           </tr>
         </thead>
         <tbody>
-          {store.employeesList.map((e, i) =>
-            <Row
-              key={i}
-              data={e}
-            />
-          )}
+          {employeesList.map((e, i) => <Row key={i} data={e} />)}
         </tbody>
         <tfoot>
           <tr>
             <td>TOTAL:</td>
-            <td>{store.totalSum}</td>
+            <td>{totalSum}</td>
           </tr>
         </tfoot>
       </table>
       <div className="fade">
-        You have <u>{store.highEarnersCount} team members</u> that earn more than 500$/day.
+        You have <u>{highEarnersCount} team members</u> that earn more than 500$/day.
       </div>
-    </div>);
-  }
-});
+    </div>
+  )
+);
 
-class Controls extends Component {
-  addEmployee() {
+const Controls = connect()(({ dispatch }) => {
+  const addEmployee = () => {
     const name = prompt("The name:");
     const salary = parseInt(prompt("The salary:"), 10) || 0;
-    this.props.store.pushEmployee({ name, salary });
-  }
+    dispatch(actions.addEmployee({ name, salary }));
+  };
 
-  clearList() {
-    this.props.store.clearList();
-  }
+  const clearList = () => {
+    dispatch(actions.clearList());
+  };
 
-  render() {
-    return (<div className="controls">
-      <button onClick={this.clearList.bind(this)}>clear table</button>
-      <button onClick={this.addEmployee.bind(this)}>add record</button>
-    </div>);
-  }
-}
+  return (<div className="controls">
+    <button onClick={() => clearList()}>clear table</button>
+    <button onClick={() => addEmployee()}>add record</button>
+  </div>);
+});
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <h1>Mobx Table</h1>
-        <Controls store={appStore} />
-        <Table store={appStore} />
-      </div>
-    );
-  }
-}
+export const App = () => (
+  <div>
+    <h1>Redux Table</h1>
+    <Controls />
+    <Table />
+  </div>
+);
 
 export default App;
