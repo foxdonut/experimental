@@ -1,7 +1,7 @@
 {
-  "name": "meiosis-table",
+  "name": "cascading-components",
   "version": "1.0.0",
-  "description": "meiosis experimentation",
+  "description": "barneycarroll cascading components",
   "main": "src/index.js",
   "scripts": {
     "start": "static-server -p ${PORT:-7000}",
@@ -13,27 +13,23 @@
     "url": "git+https://github.com/foxdonut/experimental.git"
   },
   "keywords": [
-    "meiosis"
+    "mithril"
   ],
-  "author": "js-craft",
+  "author": "barneycarroll",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/foxdonut/experimental/issues"
   },
   "homepage": "https://github.com/foxdonut/experimental#readme",
   "dependencies": {
-    "flyd": "^0.2.6",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2"
+    "bss": "^1.1.6",
+    "mithril": "^1.1.6"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babelify": "^8.0.0",
-    "browserify": "^16.2.0",
-    "eslint": "^4.19.1",
-    "eslint-plugin-react": "^7.7.0",
+    "browserify": "^16.2.2",
     "static-server": "^2.2.1",
     "watchify": "^3.11.0"
   }

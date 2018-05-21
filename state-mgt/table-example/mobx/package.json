@@ -4,7 +4,7 @@
   "description": "mobx experimentation",
   "main": "src/index.jsx",
   "scripts": {
-    "start": "static-server -p 7000",
+    "start": "static-server -p ${PORT:-7000}",
     "build": "browserify src/index.jsx -t [ babelify ] -o build/generated-app.js",
     "watch": "watchify src/index.jsx -t [ babelify ] -o build/generated-app.js -v"
   },
