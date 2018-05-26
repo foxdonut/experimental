@@ -1,4 +1,4 @@
-import m from "mithril";
+import m from "mithril"
 import { Pages } from "./constants"
 import { createList } from "./list"
 import { createForm } from "./form"
@@ -15,8 +15,8 @@ export const createApp = update => {
   const List = createList(actions)(update)
   const Form = createForm(actions)(update)
 
-  componentMap[Pages.LIST] = List;
-  componentMap[Pages.FORM] = Form;
+  componentMap[Pages.LIST] = List
+  componentMap[Pages.FORM] = Form
 
   return {
     view: vnode => {
@@ -30,13 +30,3 @@ export const createApp = update => {
     }
   }
 }
-
-
-// router.navigateTo(Constant.PAGE_ID, params)
-// componentMap[PAGE_ID].navigateTo(params)
-// loadData().then(update())
-// layout.render(componentMap[model.page.id])
-
-// router, layout need component maps
-// components need reference to router / actions
-

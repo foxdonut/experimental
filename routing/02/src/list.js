@@ -1,14 +1,15 @@
 import m from "mithril"
-import { Pages } from "./constants"
+
+export const ListPage = "ListPage";
 
 export const createList = actions => update => {
   return {
-    navigateTo: () => update({ pageId: Pages.LIST }),
+    pageId: ListPage,
     view: vnode => m("div",
       "List Page",
       m("div",
         ["a", "b"].map(item => m("button",
-          { onclick: () => actions.navigateTo(Pages.FORM, item) },
+          { onclick: () => actions.editItem(item) },
           "Form ", item
         ))
       )
