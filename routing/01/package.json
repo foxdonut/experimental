@@ -1,0 +1,39 @@
+{
+  "name": "routing-01",
+  "version": "1.0.0",
+  "description": "routting experimentation",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "static-server -p ${PORT:-7000}",
+    "build": "browserify src/index.js -t [ babelify ] -o build/generated-app.js",
+    "watch": "watchify src/index.js -t [ babelify ] -o build/generated-app.js -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foxdonut/experimental.git"
+  },
+  "keywords": [
+    "meiosis",
+    "routing"
+  ],
+  "author": "foxdonut",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/foxdonut/experimental/issues"
+  },
+  "homepage": "https://github.com/foxdonut/experimental#readme",
+  "dependencies": {
+    "mithril": "^1.1.6",
+    "mithril-stream": "^1.1.0",
+    "patchinko": "^3.2.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.0",
+    "eslint": "^4.19.1",
+    "static-server": "^2.2.1",
+    "watchify": "^3.11.0"
+  }
+}
