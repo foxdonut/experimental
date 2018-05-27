@@ -6,13 +6,8 @@ import { FormPage, createForm } from "./form"
 export const createApp = update => {
   const router = createRouter(update)
 
-  const actions = {
-    editItem: item => router.navigateTo(FormPage, item),
-    saveItem: item => router.navigateTo(ListPage)
-  }
-
   Array.of(createList, createForm).forEach(
-    create => router.register(create(actions)(update)))
+    create => router.register(create(router)(update)))
 
   return {
     view: vnode => {
