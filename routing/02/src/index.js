@@ -14,13 +14,13 @@ m.route(document.getElementById("app"), "/", {
   "/": Root,
   "/list": {
     onmatch: () => {
-      router.navigateTo(ListPage)
+      router.navigate(ListPage)
       return Root
     }
   },
   "/form/:item": {
     onmatch: ({ item }) => {
-      router.navigateTo(FormPage, { item })
+      router.navigate(FormPage, { item })
       return Root
     }
   }

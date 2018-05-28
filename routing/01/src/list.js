@@ -1,7 +1,5 @@
 import m from "mithril"
 
-export const ListPage = "ListPage"
-
 export const createList = actions => _update => {
   return {
     pageId: ListPage,

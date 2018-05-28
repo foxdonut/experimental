@@ -12,9 +12,9 @@ const App = createApp(update)
 const navigator = App.router
 const router = new Navigo(null, true)
 router.on({
-  "/": () => navigator.navigateTo(ListPage),
-  "/list": { as: ListPage, handler: () => navigator.navigateTo(ListPage) },
-  "/form/:item": { as: FormPage, handler: params => navigator.navigateTo(FormPage, params) }
+  "/": () => navigator.navigate(ListPage),
+  "/list": { as: ListPage, handler: () => navigator.navigate(ListPage) },
+  "/form/:item": { as: FormPage, handler: params => navigator.navigate(FormPage, params) }
 })
 
 const element = document.getElementById("app")

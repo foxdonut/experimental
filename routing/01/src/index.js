@@ -2,7 +2,7 @@ import m from "mithril"
 import stream from "mithril-stream"
 import { P } from "patchinko"
 import { createApp } from "./app"
-import { ListPage } from "./list"
+import { ListPage } from "./constants"
 
 const update = stream()
 const models = stream.scan(P, { pageId: ListPage }, update)

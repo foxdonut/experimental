@@ -7,11 +7,11 @@ const loadData = _item => ({
   then: fn => setTimeout(fn, 50)
 })
 
-export const createForm = router => update => {
+export const createForm = navigator => update => {
   return {
     pageId: FormPage,
-    //navigateTo: item => update({ pageId: FormPage, item }),
-    navigateTo: ({ item }) => {
+    //navigate: item => update({ pageId: FormPage, item }),
+    navigate: ({ item }) => {
       loadData(item).then(() => {
         update({ pageId: FormPage, item })
         m.redraw()
@@ -24,7 +24,7 @@ export const createForm = router => update => {
         "Form Page for item ", model.item,
         m("div",
           m("button",
-            { onclick: () => router.navigateTo(ListPage) },
+            { onclick: () => navigator.navigate(ListPage) },
             "List"
           )
         )

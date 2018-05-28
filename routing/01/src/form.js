@@ -1,11 +1,10 @@
 import m from "mithril"
+import { ListPage } from "./constants"
 
-export const FormPage = "FormPage"
-
-export const createForm = actions => update => {
+export const createForm = navigator => update => {
   return {
     pageId: FormPage,
-    navigateTo: item => update({ pageId: FormPage, item }),
+    navigate: item => update({ pageId: FormPage, item }),
     view: vnode => {
       const model = vnode.attrs.model
 
@@ -13,7 +12,7 @@ export const createForm = actions => update => {
         "Form Page for item ", model.item,
         m("div",
           m("button",
-            { onclick: () => actions.saveItem(model.item) },
+            { onclick: () => navigator.navigate(ListPage) },
             "List"
           )
         )

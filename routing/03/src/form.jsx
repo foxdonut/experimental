@@ -10,8 +10,8 @@ const loadData = _item => ({
 export const createForm = router => update => {
   return {
     pageId: FormPage,
-    //navigateTo: item => update({ pageId: FormPage, item }),
-    navigateTo: ({ item }) => {
+    //navigate: item => update({ pageId: FormPage, item }),
+    navigate: ({ item }) => {
       loadData(item).then(() => {
         update(model => Object.assign(model, { pageId: FormPage, item }))
       })

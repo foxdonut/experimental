@@ -10,7 +10,7 @@ export const createList = router => _update => {
       List Page
       <div>
         {["a", "b"].map(item => (<button key={item}
-          onClick={() => router.navigateTo(FormPage, { item })}>
+          onClick={() => router.navigate(FormPage, { item })}>
           Form {item}
         </button>))}
       </div>

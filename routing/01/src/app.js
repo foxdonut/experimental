@@ -1,23 +1,19 @@
 import m from "mithril"
-import { createRouter } from "./router"
-import { ListPage, createList } from "./list"
-import { FormPage, createForm } from "./form"
+import { createNavigator } from "./navigator"
+import { createList } from "./list"
+import { createForm } from "./form"
 
 export const createApp = update => {
-  const router = createRouter(update)
-
-  const actions = {
-    editItem: item => router.navigateTo(FormPage, item),
-    saveItem: _item => router.navigateTo(ListPage)
-  }
+  const navigator = createNavigator(update)
 
   Array.of(createList, createForm).forEach(
-    create => router.register(create(actions)(update)))
+    create => navigator.register(create(navigator)(update)))
 
   return {
+    navigator,
     view: vnode => {
       const model = vnode.attrs.model
-      const Component = router.getComponent(model.pageId)
+      const Component = navigator.getComponent(model.pageId)
 
       return m("div",
         "Hello, world",

@@ -5,14 +5,14 @@ export const createRouter = update => {
     register: Component => {
       componentMap[Component.pageId] = Component
     },
-    navigateTo: (pageId, params) => {
+    navigate: (pageId, params) => {
       const Component = componentMap[pageId]
 
-      if (Component && Component.navigateTo) {
-        Component.navigateTo(params)
+      if (Component && Component.navigate) {
+        Component.navigate(params)
       }
       else {
-        update({ pageId, params })
+        update(model => Object.assign(model, { pageId, params }))
       }
     },
     getComponent: pageId => componentMap[pageId]
