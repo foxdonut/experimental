@@ -3,7 +3,7 @@ import { ListPage } from "./list"
 
 export const FormPage = "FormPage"
 
-const loadData = item => ({
+const loadData = _item => ({
   then: fn => setTimeout(fn, 50)
 })
 

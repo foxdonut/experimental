@@ -10,7 +10,7 @@ const models = stream.scan(P, { pageId: ListPage }, update)
 const App = createApp(update)
 const router = App.router
 const Root = { view: () => m(App, { model: models() }) }
-m.route(document.body, "/", {
+m.route(document.getElementById("app"), "/", {
   "/": Root,
   "/list": {
     onmatch: () => {

@@ -8,7 +8,7 @@ export const createApp = update => {
 
   const actions = {
     editItem: item => router.navigateTo(FormPage, item),
-    saveItem: item => router.navigateTo(ListPage)
+    saveItem: _item => router.navigateTo(ListPage)
   }
 
   Array.of(createList, createForm).forEach(

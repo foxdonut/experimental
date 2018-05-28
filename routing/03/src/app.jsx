@@ -1,7 +1,7 @@
-import m from "mithril"
+import React from "react"
 import { createRouter } from "./router"
-import { createList } from "./list"
-import { createForm } from "./form"
+import { createList } from "./list.jsx"
+import { createForm } from "./form.jsx"
 
 export const createApp = update => {
   const router = createRouter(update)
@@ -11,14 +11,13 @@ export const createApp = update => {
 
   return {
     router,
-    view: vnode => {
-      const model = vnode.attrs.model
+    view: model => {
       const Component = router.getComponent(model.pageId)
 
-      return m("div",
-        "Hello, world",
-        m(Component, { model })
-      )
+      return (<div>
+        Hello, world
+        {Component.view(model)}
+      </div>)
     }
   }
 }

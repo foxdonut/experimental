@@ -7,4 +7,4 @@ import { ListPage } from "./list"
 const update = stream()
 const models = stream.scan(P, { pageId: ListPage }, update)
 const App = createApp(update)
-m.mount(document.body, { view: () => m(App, { model: models() }) })
+m.mount(document.getElementById("app"), { view: () => m(App, { model: models() }) })

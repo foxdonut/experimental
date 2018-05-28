@@ -1,7 +1,7 @@
 {
-  "name": "routing-01",
+  "name": "routing-02",
   "version": "1.0.0",
-  "description": "routting experimentation",
+  "description": "routing experimentation",
   "main": "src/index.js",
   "scripts": {
     "start": "static-server -p ${PORT:-7000}",
