@@ -1,5 +1,5 @@
 {
-  "name": "routing-03",
+  "name": "routing-04",
   "version": "1.0.0",
   "description": "routing experimentation",
   "main": "src/index.js",
@@ -24,7 +24,7 @@
   "homepage": "https://github.com/foxdonut/experimental#readme",
   "dependencies": {
     "flyd": "^0.2.6",
-    "navigation": "^5.0.1",
+    "navigo": "^7.1.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0"
   },

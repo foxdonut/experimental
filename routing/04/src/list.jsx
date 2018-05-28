@@ -1,7 +1,7 @@
 import React from "react"
 import { FormPage } from "./form.jsx"
 
-export const ListPage = "listPage"
+export const ListPage = "ListPage"
 
 export const createList = router => _update => {
   return {
@@ -10,7 +10,7 @@ export const createList = router => _update => {
       List Page
       <div>
         {["a", "b"].map(item => (<button key={item}
-          onClick={() => router.navigate(FormPage, { item })}>
+          onClick={() => router.navigateTo(FormPage, { item })}>
           Form {item}
         </button>))}
       </div>

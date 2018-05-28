@@ -1,18 +1,31 @@
 import React from "react"
-import { createRouter } from "./router"
-import { createList } from "./list.jsx"
-import { createForm } from "./form.jsx"
+import { StateNavigator } from "navigation"
+import { ListPage, createList } from "./list.jsx"
+import { FormPage, createForm } from "./form.jsx"
 
 export const createApp = update => {
-  const router = createRouter(update)
+  const stateNavigator = new StateNavigator([
+    { key: ListPage, route: "" },
+    { key: FormPage }
+  ])
 
-  Array.of(createList, createForm).forEach(
-    create => router.register(create(router)(update)))
+  const componentMap = {}
+
+  Array.of(createList, createForm).forEach(create => {
+    const Component = create(stateNavigator)(update)
+    componentMap[Component.pageId] = Component
+    stateNavigator.states[Component.pageId].renderView = (data, asyncData) => {
+      console.log("navigate to", Component.pageId, "with data", data)
+      update(model => Object.assign(model,
+        { pageId: Component.pageId, params: Object.assign({}, data, asyncData) }
+      )) }
+  })
+
+  stateNavigator.start()
 
   return {
-    router,
     view: model => {
-      const Component = router.getComponent(model.pageId)
+      const Component = componentMap[model.pageId]
 
       return (<div>
         Hello, world

@@ -1,7 +1,7 @@
 import React from "react"
 import { ListPage } from "./list.jsx"
 
-export const FormPage = "formPage"
+export const FormPage = "FormPage"
 
 const loadData = _item => ({
   then: fn => setTimeout(fn, 50)
@@ -20,7 +20,7 @@ export const createForm = router => update => {
       <div>
         Form Page for item {model.item}
         <div>
-          <button onClick={() => router.navigate(ListPage)}>
+          <button onClick={() => router.navigateTo(ListPage)}>
             List
           </button>
         </div>
