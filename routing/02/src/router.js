@@ -1,5 +1,4 @@
 export const createRouter = update => {
-  const registrations = {}
   const componentMap = {}
 
   return {

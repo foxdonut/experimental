@@ -10,6 +10,7 @@ export const createApp = update => {
     create => router.register(create(router)(update)))
 
   return {
+    router,
     view: vnode => {
       const model = vnode.attrs.model
       const Component = router.getComponent(model.pageId)

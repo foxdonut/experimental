@@ -11,7 +11,7 @@ export const createForm = router => update => {
   return {
     pageId: FormPage,
     //navigateTo: item => update({ pageId: FormPage, item }),
-    navigateTo: item => {
+    navigateTo: ({ item }) => {
       loadData(item).then(() => {
         update({ pageId: FormPage, item })
         m.redraw()
