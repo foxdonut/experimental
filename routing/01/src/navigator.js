@@ -1,4 +1,4 @@
-export const createRouter = update => {
+export const createNavigator = update => {
   const componentMap = {}
 
   return {
@@ -12,7 +12,7 @@ export const createRouter = update => {
         Component.navigate(params)
       }
       else {
-        update({ pageId, params })
+        update(model => Object.assign(model, { pageId, params }))
       }
     },
     getComponent: pageId => componentMap[pageId]

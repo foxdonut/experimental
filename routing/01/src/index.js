@@ -1,10 +1,26 @@
-import m from "mithril"
-import stream from "mithril-stream"
-import { P } from "patchinko"
-import { createApp } from "./app"
-import { ListPage } from "./constants"
+import ReactDOM from "react-dom"
+import flyd from "flyd"
+import Navigo from "navigo"
+import { createApp } from "./app.jsx"
+import { FormPage, ListPage } from "./constants"
 
-const update = stream()
-const models = stream.scan(P, { pageId: ListPage }, update)
+const update = flyd.stream()
+const models = flyd.scan((model, func) => func(model), { pageId: ListPage }, update)
 const App = createApp(update)
-m.mount(document.getElementById("app"), { view: () => m(App, { model: models() }) })
+
+const navigator = App.navigator
+const router = new Navigo(null, true)
+router.on({
+  "/list": { as: ListPage, handler: () => navigator.navigate(ListPage) },
+  "/form/:item": { as: FormPage, handler: params => navigator.navigate(FormPage, params) }
+})
+
+const element = document.getElementById("app")
+models.map(model => { ReactDOM.render(App.view(model), element) })
+
+models.map(model => {
+  const route = router.generate(model.pageId, model)
+  if (document.location.hash !== route) {
+    window.history.pushState({}, "", route)
+  }
+})

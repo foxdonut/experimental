@@ -1,7 +1,5 @@
 import m from "mithril"
-import { ListPage } from "./list"
-
-export const FormPage = "FormPage"
+import { FormPage, ListPage } from "./constants"
 
 const loadData = _item => ({
   then: fn => setTimeout(fn, 50)
@@ -9,7 +7,6 @@ const loadData = _item => ({
 
 export const createForm = navigator => update => {
   return {
-    pageId: FormPage,
     //navigate: item => update({ pageId: FormPage, item }),
     navigate: ({ item }) => {
       loadData(item).then(() => {

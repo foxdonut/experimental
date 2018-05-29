@@ -1,5 +1,5 @@
 {
-  "name": "routing-01",
+  "name": "routing-04",
   "version": "1.0.0",
   "description": "routing experimentation",
   "main": "src/index.js",
@@ -23,16 +23,19 @@
   },
   "homepage": "https://github.com/foxdonut/experimental#readme",
   "dependencies": {
-    "mithril": "^1.1.6",
-    "mithril-stream": "^1.1.0",
-    "patchinko": "^3.2.1"
+    "flyd": "^0.2.6",
+    "navigo": "^7.1.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.6.1",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
     "babelify": "^8.0.0",
-    "browserify": "^16.2.0",
+    "browserify": "^16.2.2",
     "eslint": "^4.19.1",
+    "eslint-plugin-react": "^7.8.2",
     "static-server": "^2.2.1",
     "watchify": "^3.11.0"
   }

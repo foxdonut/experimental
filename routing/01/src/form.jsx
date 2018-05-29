@@ -1,7 +1,5 @@
 import React from "react"
-import { ListPage } from "./list.jsx"
-
-export const FormPage = "FormPage"
+import { FormPage, ListPage } from "./constants"
 
 const loadData = _item => ({
   then: fn => setTimeout(fn, 50)

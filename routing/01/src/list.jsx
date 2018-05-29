@@ -1,7 +1,5 @@
 import React from "react"
-import { FormPage } from "./form.jsx"
-
-export const ListPage = "ListPage"
+import { FormPage, ListPage } from "./constants"
 
 export const createList = router => _update => {
   return {

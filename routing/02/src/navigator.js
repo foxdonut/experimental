@@ -1,9 +1,9 @@
-export const createRouter = update => {
-  const componentMap = {}
+export const createNavigator = update => {
+  let componentMap = {}
 
   return {
-    register: Component => {
-      componentMap[Component.pageId] = Component
+    register: compMap => {
+      componentMap = compMap
     },
     navigate: (pageId, params) => {
       const Component = componentMap[pageId]

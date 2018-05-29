@@ -1,13 +1,16 @@
 import m from "mithril"
 import { createNavigator } from "./navigator"
-import { createList } from "./list"
+import { FormPage, ListPage } from "./constants"
 import { createForm } from "./form"
+import { createList } from "./list"
 
 export const createApp = update => {
   const navigator = createNavigator(update)
 
-  Array.of(createList, createForm).forEach(
-    create => navigator.register(create(navigator)(update)))
+  navigator.register({
+    [FormPage]: createForm(navigator)(update),
+    [ListPage]: createList(navigator)(update)
+  })
 
   return {
     navigator,

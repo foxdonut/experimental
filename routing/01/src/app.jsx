@@ -1,18 +1,18 @@
 import React from "react"
-import { createRouter } from "./router"
+import { createNavigator } from "./navigator"
 import { createList } from "./list.jsx"
 import { createForm } from "./form.jsx"
 
 export const createApp = update => {
-  const router = createRouter(update)
+  const navigator = createNavigator(update)
 
   Array.of(createList, createForm).forEach(
-    create => router.register(create(router)(update)))
+    create => navigator.register(create(navigator)(update)))
 
   return {
-    router,
+    navigator,
     view: model => {
-      const Component = router.getComponent(model.pageId)
+      const Component = navigator.getComponent(model.pageId)
 
       return (<div>
         Hello, world
