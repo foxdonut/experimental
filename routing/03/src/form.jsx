@@ -1,28 +1,31 @@
 import React from "react"
-import { ListPage } from "./list.jsx"
+import { FormPage, HomePage, ListPage } from "./constants"
 
-export const FormPage = "formPage"
+const items = {
+  "a": "Article",
+  "b": "Book"
+}
 
-const loadData = _item => ({
-  then: fn => setTimeout(fn, 50)
+const loadData = itemId => ({
+  then: fn => setTimeout(() => fn(items[itemId]), 500)
 })
 
-export const createForm = router => update => {
+export const createForm = stateNavigator => _update => {
   return {
     pageId: FormPage,
-    //navigate: item => update({ pageId: FormPage, item }),
-    navigate: ({ item }) => {
-      loadData(item).then(() => {
-        update(model => Object.assign(model, { pageId: FormPage, item }))
-      })
+    navigating: ({ itemId }, url, navigate) => {
+      loadData(itemId).then(item => navigate({ item }))
     },
     view: model => (
       <div>
         Form Page for item {model.item}
         <div>
-          <button onClick={() => router.navigate(ListPage)}>
+          <button onClick={() => stateNavigator.navigate(ListPage)}>
             List
           </button>
+        </div>
+        <div>
+          <a href={"#" + stateNavigator.getNavigationLink(HomePage)}>Home Page</a>
         </div>
       </div>
     )

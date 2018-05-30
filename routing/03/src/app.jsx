@@ -1,35 +1,41 @@
 import React from "react"
 import { StateNavigator } from "navigation"
-import { ListPage, createList } from "./list.jsx"
-import { FormPage, createForm } from "./form.jsx"
+import { HomePage, ListPage, FormPage } from "./constants"
+import { createHome } from "./home.jsx"
+import { createList } from "./list.jsx"
+import { createForm } from "./form.jsx"
 
 export const createApp = update => {
   const stateNavigator = new StateNavigator([
-    { key: ListPage, route: "" },
-    { key: FormPage }
+    { key: HomePage, route: "" },
+    { key: ListPage, route: "/list" },
+    { key: FormPage, route: "/form/{itemId}" }
   ])
 
-  const componentMap = {}
+  Array.of(createHome, createList, createForm).forEach(create => {
+    const component = create(stateNavigator)(update)
+    const state = stateNavigator.states[component.pageId]
+    state.component = component
 
-  Array.of(createList, createForm).forEach(create => {
-    const Component = create(stateNavigator)(update)
-    componentMap[Component.pageId] = Component
-    stateNavigator.states[Component.pageId].renderView = (data, asyncData) => {
-      console.log("navigate to", Component.pageId, "with data", data)
-      update(model => Object.assign(model,
-        { pageId: Component.pageId, params: Object.assign({}, data, asyncData) }
-      )) }
+    if (component.navigating) {
+      state.navigating = component.navigating
+    }
+  })
+
+  stateNavigator.onNavigate(() => {
+    const { data, asyncData, url } = stateNavigator.stateContext
+    update(model => Object.assign(model, data, asyncData, { url }))
   })
 
   stateNavigator.start()
 
   return {
     view: model => {
-      const Component = componentMap[model.pageId]
+      const component = stateNavigator.stateContext.state.component
 
       return (<div>
         Hello, world
-        {Component.view(model)}
+        {component.view(model)}
       </div>)
     }
   }

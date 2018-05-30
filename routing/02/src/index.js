@@ -1,39 +1,28 @@
 import m from "mithril"
 import stream from "mithril-stream"
 import { P } from "patchinko"
-import { compile } from "path-to-regexp"
 import { createApp } from "./app"
-import { FormPage, ListPage } from "./constants"
+import { HomePage } from "./constants"
 
 const update = stream()
-const models = stream.scan(P, { pageId: ListPage }, update)
+const models = stream.scan(P, { pageId: HomePage }, update)
 const App = createApp(update)
 const navigator = App.navigator
-const Root = { view: () => m(App, { model: models() }) }
 
-m.route(document.getElementById("app"), "/list", {
-  "/list": {
-    onmatch: () => {
-      navigator.navigate(ListPage)
-      return Root
-    }
-  },
-  "/form/:item": {
-    onmatch: ({ item }) => {
-      navigator.navigate(FormPage, { item })
-      return Root
-    }
+m.route(document.getElementById("app"), "/", Object.keys(navigator.routes).reduce((result, route) => {
+  result[route] = {
+    onmatch: params => navigator.navigate(navigator.routes[route], params),
+    render: () => m(App, { model: models() })
   }
-})
+  return result
+}, {}))
 
-const routeMap = {
-  ListPage: compile("/list"),
-  FormPage: compile("/form/:item")
-}
-
+/*
+// only for using tracer in development
 models.map(model => {
-  const route = "#!" + routeMap[model.pageId](model)
+  const route = "#!" + navigator.getPath(model.pageId, model.params)
   if (document.location.hash !== route) {
     window.history.pushState({}, "", route)
   }
 })
+*/

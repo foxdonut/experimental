@@ -1,19 +1,22 @@
 import m from "mithril"
-import { FormPage, ListPage } from "./constants"
+import { href, FormPage, HomePage, ListPage } from "./constants"
 
-const loadData = _item => ({
-  then: fn => setTimeout(fn, 50)
-})
+const items = {
+  "a": "Article",
+  "b": "Book"
+}
+
+const loadData = itemId => new Promise(resolve =>
+  setTimeout(() => resolve(items[itemId]), 5)
+)
 
 export const createForm = navigator => update => {
   return {
-    //navigate: item => update({ pageId: FormPage, item }),
-    navigate: ({ item }) => {
-      loadData(item).then(() => {
-        update({ pageId: FormPage, item })
-        m.redraw()
-      })
-    },
+    navigate: ({ itemId }) =>
+      loadData(itemId).then(item => {
+        update({ pageId: FormPage, params: { itemId }, item })
+      }),
+
     view: vnode => {
       const model = vnode.attrs.model
 
@@ -21,9 +24,12 @@ export const createForm = navigator => update => {
         "Form Page for item ", model.item,
         m("div",
           m("button",
-            { onclick: () => navigator.navigate(ListPage) },
+            { onclick: () => m.route.set(navigator.getPath(ListPage)) },
             "List"
           )
+        ),
+        m("div",
+          m("a", href(navigator.getPath(HomePage)), "Home Page")
         )
       )
     }
