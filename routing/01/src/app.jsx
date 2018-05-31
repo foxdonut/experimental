@@ -1,18 +1,37 @@
 import React from "react"
-import { createNavigator } from "./navigator"
+import Navigo from "navigo"
+import { createHome } from "./home.jsx"
 import { createList } from "./list.jsx"
 import { createForm } from "./form.jsx"
 
 export const createApp = update => {
-  const navigator = createNavigator(update)
+  const router = new Navigo(null, true)
+  router.navigateTo = (id, params) => router.navigate(router.generate(id, params))
 
-  Array.of(createList, createForm).forEach(
-    create => navigator.register(create(navigator)(update)))
+  const componentMap = {}
+  const routes = {}
+
+  Array.of(createHome, createList, createForm).forEach(create => {
+    const component = create(router)(update)
+    componentMap[component.pageId] = component
+    routes[component.route] = {
+      as: component.pageId,
+      uses: params => {
+        if (component.navigate) {
+          component.navigate(params)
+        }
+        else {
+          update(model => Object.assign(model, { pageId: component.pageId, params }))
+        }
+      }
+    }
+  })
+  router.on(routes).resolve()
 
   return {
-    navigator,
+    router,
     view: model => {
-      const Component = navigator.getComponent(model.pageId)
+      const Component = componentMap[model.pageId]
 
       return (<div>
         Hello, world
