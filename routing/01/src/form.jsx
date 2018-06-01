@@ -10,11 +10,9 @@ const loadData = itemId => new Promise(resolve =>
   setTimeout(() => resolve(items[itemId]), 5)
 )
 
-export const createForm = router => update => {
+export const createForm = navigator => update => {
   return {
-    pageId: FormPage,
-    route: "/form/:itemId",
-    navigate: ({ itemId }) => {
+    navigating: ({ itemId }) => {
       loadData(itemId).then(item => {
         update(model => Object.assign(model, { pageId: FormPage, params: { itemId }, item }))
       })
@@ -23,12 +21,12 @@ export const createForm = router => update => {
       <div>
         Form Page for item {model.item}
         <div>
-          <button onClick={() => router.navigateTo(ListPage)}>
+          <button onClick={() => navigator.navigateTo(ListPage)}>
             List
           </button>
         </div>
         <div>
-          <a href={router.generate(HomePage)}>Home Page</a>
+          <a href={navigator.getLink(HomePage)}>Home Page</a>
         </div>
       </div>
     )

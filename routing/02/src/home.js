@@ -6,7 +6,7 @@ export const createHome = navigator => _update => {
     view: _vnode => m("div",
       "Home Page",
       m("div",
-        m("a", href(navigator.getPath(ListPage)), "List Page")
+        m("a", href(navigator.getLink(ListPage)), "List Page")
       )
     )
   }

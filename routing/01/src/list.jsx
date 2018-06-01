@@ -1,20 +1,18 @@
 import React from "react"
-import { FormPage, HomePage, ListPage } from "./constants"
+import { FormPage, HomePage } from "./constants"
 
-export const createList = router => _update => {
+export const createList = navigator => _update => {
   return {
-    pageId: ListPage,
-    route: "/list",
     view: _model => (<div>
       List Page
       <div>
         {["a", "b"].map(itemId => (<button key={itemId}
-          onClick={() => router.navigateTo(FormPage, { itemId })}>
+          onClick={() => navigator.navigateTo(FormPage, { itemId })}>
           Form {itemId}
         </button>))}
       </div>
       <div>
-        <a href={router.generate(HomePage)}>Home Page</a>
+        <a href={navigator.getLink(HomePage)}>Home Page</a>
       </div>
     </div>)
   }

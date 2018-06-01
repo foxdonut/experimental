@@ -10,7 +10,7 @@ const loadData = itemId => ({
   then: fn => setTimeout(() => fn(items[itemId]), 500)
 })
 
-export const createForm = stateNavigator => _update => {
+export const createForm = navigator => _update => {
   return {
     pageId: FormPage,
     navigating: ({ itemId }, url, navigate) => {
@@ -20,12 +20,12 @@ export const createForm = stateNavigator => _update => {
       <div>
         Form Page for item {model.item}
         <div>
-          <button onClick={() => stateNavigator.navigate(ListPage)}>
+          <button onClick={() => navigator.navigateTo(ListPage)}>
             List
           </button>
         </div>
         <div>
-          <a href={"#" + stateNavigator.getNavigationLink(HomePage)}>Home Page</a>
+          <a href={"#" + navigator.getLink(HomePage)}>Home Page</a>
         </div>
       </div>
     )

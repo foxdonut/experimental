@@ -24,12 +24,12 @@ export const createForm = navigator => update => {
         "Form Page for item ", model.item,
         m("div",
           m("button",
-            { onclick: () => m.route.set(navigator.getPath(ListPage)) },
+            { onclick: () => m.route.set(navigator.getLink(ListPage)) },
             "List"
           )
         ),
         m("div",
-          m("a", href(navigator.getPath(HomePage)), "Home Page")
+          m("a", href(navigator.getLink(HomePage)), "Home Page")
         )
       )
     }

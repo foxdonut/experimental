@@ -1,41 +1,29 @@
 import React from "react"
-import Navigo from "navigo"
+import { createNavigator } from "./navigator"
+import { HomePage, ListPage, FormPage } from "./constants"
 import { createHome } from "./home.jsx"
 import { createList } from "./list.jsx"
 import { createForm } from "./form.jsx"
 
 export const createApp = update => {
-  const router = new Navigo(null, true)
-  router.navigateTo = (id, params) => router.navigate(router.generate(id, params))
+  const navigator = createNavigator(update)
 
-  const componentMap = {}
-  const routes = {}
+  navigator.register([
+    { key: HomePage, component: createHome(navigator)(update), route: "/" },
+    { key: ListPage, component: createList(navigator)(update), route: "/list" },
+    { key: FormPage, component: createForm(navigator)(update), route: "/form/:itemId" }
+  ])
 
-  Array.of(createHome, createList, createForm).forEach(create => {
-    const component = create(router)(update)
-    componentMap[component.pageId] = component
-    routes[component.route] = {
-      as: component.pageId,
-      uses: params => {
-        if (component.navigate) {
-          component.navigate(params)
-        }
-        else {
-          update(model => Object.assign(model, { pageId: component.pageId, params }))
-        }
-      }
-    }
-  })
-  router.on(routes).resolve()
+  navigator.start()
 
   return {
-    router,
+    navigator,
     view: model => {
-      const Component = componentMap[model.pageId]
+      const Component = navigator.getComponent(model.pageId)
 
       return (<div>
         Hello, world
-        {Component.view(model)}
+        {Component && Component.view(model)}
       </div>)
     }
   }

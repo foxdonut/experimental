@@ -6,7 +6,7 @@
   "scripts": {
     "start": "static-server -p ${PORT:-7000}",
     "build": "browserify src/index.js -t [ babelify ] -o build/generated-app.js",
-    "watch": "watchify src/index.js -t [ babelify ] -o build/generated-app.js -v"
+    "watch": "watchify src/dev.js -t [ babelify ] -o build/generated-app.js -v"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,8 @@
     "browserify": "^16.2.2",
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.8.2",
+    "meiosis": "^1.4.1",
+    "meiosis-tracer": "^1.4.1",
     "static-server": "^2.2.1",
     "watchify": "^3.11.0"
   }

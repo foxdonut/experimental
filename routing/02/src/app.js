@@ -1,17 +1,17 @@
 import m from "mithril"
 import { createNavigator } from "./navigator"
-import { HomePage, FormPage, ListPage } from "./constants"
-import { createForm } from "./form"
+import { HomePage, ListPage, FormPage } from "./constants"
 import { createHome } from "./home"
 import { createList } from "./list"
+import { createForm } from "./form"
 
 export const createApp = update => {
   const navigator = createNavigator(update)
 
   navigator.register([
-    { id: HomePage, component: createHome(navigator)(update), route: "/" },
-    { id: FormPage, component: createForm(navigator)(update), route: "/form/:itemId" },
-    { id: ListPage, component: createList(navigator)(update), route: "/list" }
+    { key: HomePage, component: createHome(navigator)(update), route: "/" },
+    { key: ListPage, component: createList(navigator)(update), route: "/list" },
+    { key: FormPage, component: createForm(navigator)(update), route: "/form/:itemId" }
   ])
 
   return {
@@ -22,7 +22,7 @@ export const createApp = update => {
 
       return m("div",
         "Hello, world",
-        m(Component, { model })
+        Component && m(Component, { model })
       )
     }
   }
