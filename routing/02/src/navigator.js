@@ -16,8 +16,8 @@ export const createNavigator = update => {
     navigateTo: (pageId, params) => {
       const Component = componentMap[pageId]
 
-      if (Component && Component.navigate) {
-        return Component.navigate(params)
+      if (Component && Component.navigating) {
+        return Component.navigating(params)
       }
       else {
         update({ pageId, params })

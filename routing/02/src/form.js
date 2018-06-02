@@ -12,7 +12,7 @@ const loadData = itemId => new Promise(resolve =>
 
 export const createForm = navigator => update => {
   return {
-    navigate: ({ itemId }) =>
+    navigating: ({ itemId }) =>
       loadData(itemId).then(item => {
         update({ pageId: FormPage, params: { itemId }, item })
       }),

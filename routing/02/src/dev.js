@@ -1,5 +1,6 @@
 import m from "mithril"
 import * as Main from "./index"
+import { prefix } from "./constants"
 import { trace } from "meiosis"
 import meiosisTracer from "meiosis-tracer"
 
@@ -14,7 +15,7 @@ meiosisTracer({ selector: "#tracer" })
 
 const navigator = Main.App.navigator
 Main.models.map(model => {
-  const url = "#!" + navigator.getLink(model.pageId, model.params)
+  const url = prefix + navigator.getLink(model.pageId, model.params)
   if (document.location.hash !== url) {
     window.history.pushState({}, "", url)
   }
