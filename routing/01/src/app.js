@@ -1,9 +1,8 @@
-import React from "react"
 import { createNavigator } from "./navigator"
-import { HomePage, ListPage, FormPage } from "./constants"
-import { createHome } from "./home.jsx"
-import { createList } from "./list.jsx"
-import { createForm } from "./form.jsx"
+import { m, HomePage, ListPage, FormPage } from "./constants"
+import { createHome } from "./home"
+import { createList } from "./list"
+import { createForm } from "./form"
 
 export const createApp = update => {
   const navigator = createNavigator(update)
@@ -21,10 +20,10 @@ export const createApp = update => {
     view: model => {
       const Component = navigator.getComponent(model.pageId)
 
-      return (<div>
-        Hello, world
-        {Component && Component.view(model)}
-      </div>)
+      return m("div",
+        m("div", "Hello, world"),
+        Component && Component.view(model)
+      )
     }
   }
 }

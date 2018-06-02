@@ -4,7 +4,7 @@ import { href, FormPage, HomePage } from "./constants"
 export const createList = navigator => _update => {
   return {
     view: _vnode => m("div",
-      "List Page",
+      m("div", "List Page"),
       m("div",
         ["a", "b"].map(itemId => m("button",
           //{ onclick: () => navigator.navigateTo(FormPage, { itemId }) },

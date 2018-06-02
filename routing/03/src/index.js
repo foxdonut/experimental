@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom"
 import flyd from "flyd"
-import { createApp } from "./app.jsx"
+import { createApp } from "./app"
 import { HomePage } from "./constants"
 
 export const update = flyd.stream()

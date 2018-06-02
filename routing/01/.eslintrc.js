@@ -5,17 +5,10 @@ module.exports = {
     "es6": true,
     "mocha": true
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "extends": ["eslint:recommended"],
   "parserOptions": {
-    "ecmaFeatures": {
-      "experimentalObjectRestSpread": true,
-      "jsx": true
-    },
     "sourceType": "module"
   },
-  "plugins": [
-    "react"
-  ],
   "rules": {
     "indent": [
       "error",
@@ -39,17 +32,6 @@ module.exports = {
     "semi": [
       "error",
       "never"
-    ],
-    "react/display-name": [
-      0
-    ],
-    "react/prop-types": [
-      0
     ]
-  },
-  "settings": {
-    "react": {
-      "pragma": "React"
-    }
   }
 };

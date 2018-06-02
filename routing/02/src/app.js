@@ -21,7 +21,7 @@ export const createApp = update => {
       const Component = navigator.getComponent(model.pageId)
 
       return m("div",
-        "Hello, world",
+        m("div", "Hello, world"),
         Component && m(Component, { model })
       )
     }
