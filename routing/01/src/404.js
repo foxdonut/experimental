@@ -1,4 +1,4 @@
-import { m, prefix, HomePage } from "./constants"
+import { m, HomePage } from "./constants"
 
 export const createNotFound = navigator => _update => {
   return {
@@ -6,7 +6,7 @@ export const createNotFound = navigator => _update => {
       m("div", "Not Found Page"),
       m("div", "Sorry, we could not find what you were looking 4...04"),
       m("div",
-        m("a", { href: prefix + navigator.getLink(HomePage) }, "Home Page")
+        m("a", { href:  navigator.getLink(HomePage) }, "Home Page")
       )
     )
   }
