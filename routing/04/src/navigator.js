@@ -1,6 +1,11 @@
+import Mapper from "url-mapper"
+
 export const createNavigator = update => {
   const componentMap = {}
   const navigateToMap = {}
+  const routeMap = {}
+  const routeHandlerMap = {}
+  const mapper = new Mapper()
 
   return {
     register: configs => {
@@ -16,6 +21,10 @@ export const createNavigator = update => {
           }
         }
         navigateToMap[config.key] = handler
+        if (config.route) {
+          routeMap[config.key] = config.route
+          routeHandlerMap[config.route] = handler
+        }
       })
     },
     getComponent: pageId => componentMap[pageId],
@@ -24,6 +33,17 @@ export const createNavigator = update => {
       if (target) {
         target(params)
       }
+    },
+    handleUrl: url => {
+      console.log("handleUrl:", url)
+      const matchedRoute = mapper.map(url, routeHandlerMap)
+      if (matchedRoute) {
+        matchedRoute.match(matchedRoute.values)
+      }
+    },
+    getUrl: (id, params = {}) => {
+      const route = routeMap[id]
+      return route && "#" + mapper.stringify(route, params)
     }
   }
 }

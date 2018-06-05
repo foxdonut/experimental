@@ -5,7 +5,7 @@ export const createHome = navigator => _update => {
     view: _model => m("div",
       m("div", "Home Page"),
       m("div",
-        m("a", { href: blankHref, onClick: () =>  navigator.navigateTo(ListPage) }, "List Page")
+        m("a", { href: blankHref, onClick: () => navigator.navigateTo(ListPage) }, "List Page")
       )
     )
   }
