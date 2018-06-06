@@ -10,11 +10,12 @@ const loadData = itemId => new Promise(resolve =>
   setTimeout(() => resolve(items[itemId]), 5)
 )
 
-export const createForm = navigator => _update => {
+export const createForm = navigator => update => {
   return {
     navigating: ({ itemId }, navigate) => {
       loadData(itemId).then(item => {
-        navigate(model => Object.assign(model, { item }))
+        update(model => Object.assign(model, { item }))
+        navigate()
       })
     },
     view: model => {

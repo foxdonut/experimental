@@ -1,5 +1,4 @@
 import Mapper from "url-mapper"
-import { compose } from "./utils"
 
 export const createNavigator = update => {
   const componentMap = {}
@@ -23,7 +22,7 @@ export const createNavigator = update => {
             Object.assign(model, { pageId: config.key, url: getUrl(config.key, params) })
 
           if (component.navigating) {
-            component.navigating(params, func => update(compose(func, updateFn)))
+            component.navigating(params, () => update(updateFn))
           }
           else {
             update(updateFn)
