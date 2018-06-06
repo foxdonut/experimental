@@ -5,8 +5,8 @@ import { createApp } from "./app"
 import { prefix, HomePage } from "./constants"
 
 export const update = stream()
-export const models = stream.scan(P, { pageId: HomePage }, update)
 export const App = createApp(update)
+export const models = stream.scan(P, { pageId: HomePage }, update)
 const navigator = App.navigator
 
 export const element = document.getElementById("app")
