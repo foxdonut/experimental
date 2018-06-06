@@ -7,3 +7,6 @@ export const preventDefault = func => evt => {
   evt.preventDefault()
   func(evt)
 }
+
+export const compose = (...funcs) => x =>
+  funcs.reduceRight((value, func) => func(value), x)
