@@ -6,7 +6,7 @@ export const createNavigator = update => {
   const navigateToMap = {}
   const routeMap = {}
   const routeHandlerMap = {}
-  const mapper = new Mapper()
+  const mapper = new Mapper({ query: true })
 
   const getUrl = (id, params = {}) => {
     const route = routeMap[id]
