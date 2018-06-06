@@ -1,4 +1,5 @@
-import { m, ListPage } from "./constants"
+import { ListPage } from "./constants"
+import { m, preventDefault } from "./utils"
 
 export const createHome = navigator => _update => {
   return {
@@ -7,7 +8,7 @@ export const createHome = navigator => _update => {
       m("div",
         m("a", {
           href: navigator.getUrl(ListPage),
-          onClick: evt => { evt.preventDefault(); navigator.navigateTo(ListPage) }
+          onClick: preventDefault(() => navigator.navigateTo(ListPage))
         }, "List Page")
       )
     )

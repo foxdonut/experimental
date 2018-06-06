@@ -1,5 +1,6 @@
 import { createNavigator } from "./navigator"
-import { m, HomePage, ListPage, FormPage, NotFoundPage } from "./constants"
+import { HomePage, ListPage, FormPage, NotFoundPage } from "./constants"
+import { m } from "./utils"
 import { createHome } from "./home"
 import { createList } from "./list"
 import { createForm } from "./form"

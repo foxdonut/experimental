@@ -1,3 +1,5 @@
+import { compose } from "./utils"
+
 export const createNavigator = update => {
   const componentMap = {}
   const navigateToMap = {}
@@ -7,12 +9,13 @@ export const createNavigator = update => {
       configs.forEach(config => {
         const component = config.component
         componentMap[config.key] = component
+        const updateFn = model => Object.assign(model, { pageId: config.key })
         const handler = params => {
           if (component.navigating) {
-            component.navigating(params)
+            component.navigating(params, func => update(compose(func, updateFn)))
           }
           else {
-            update(model => Object.assign(model, { pageId: config.key, params }))
+            update(updateFn)
           }
         }
         navigateToMap[config.key] = handler

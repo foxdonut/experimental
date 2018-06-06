@@ -1,4 +1,5 @@
-import { blankHref, m, FormPage, HomePage, ListPage } from "./constants"
+import { HomePage, ListPage } from "./constants"
+import { m, preventDefault } from "./utils"
 
 const items = {
   "a": "Article",
@@ -9,11 +10,11 @@ const loadData = itemId => new Promise(resolve =>
   setTimeout(() => resolve(items[itemId]), 5)
 )
 
-export const createForm = navigator => update => {
+export const createForm = navigator => _update => {
   return {
-    navigating: ({ itemId }) => {
+    navigating: ({ itemId }, navigate) => {
       loadData(itemId).then(item => {
-        update(model => Object.assign(model, { pageId: FormPage, params: { itemId }, item }))
+        navigate(model => Object.assign(model, { item }))
       })
     },
     view: model => {
@@ -26,7 +27,10 @@ export const createForm = navigator => update => {
           )
         ),
         m("div",
-          m("a", { href: blankHref, onClick: () => navigator.navigateTo(HomePage) }, "Home Page")
+          m("a", {
+            href: navigator.getUrl(HomePage),
+            onClick: preventDefault(() => navigator.navigateTo(HomePage))
+          }, "Home Page")
         )
       )
     }
