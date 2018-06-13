@@ -1,5 +1,5 @@
 import { HomePage, ListPage } from "./constants"
-import { m, preventDefault } from "./utils"
+import { m } from "./utils"
 
 const items = {
   "a": "Article",
@@ -26,10 +26,7 @@ export const createForm = navigator => _update => {
           )
         ),
         m("div",
-          m("a", {
-            href: navigator.getUrl(HomePage),
-            onClick: preventDefault(() => navigator.navigateTo(HomePage))
-          }, "Home Page")
+          m("a", { href: navigator.getUrl(HomePage) }, "Home Page")
         )
       )
     }

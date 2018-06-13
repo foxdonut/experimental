@@ -1,4 +1,5 @@
-import { m, prefix, HomePage, ListPage } from "./constants"
+import { HomePage, ListPage } from "./constants"
+import { m } from "./utils"
 
 const items = {
   "a": "Article",
@@ -24,7 +25,7 @@ export const createForm = navigator => _update => {
           )
         ),
         m("div",
-          m("a", { href: prefix + navigator.getLink(HomePage) }, "Home Page")
+          m("a", { href: navigator.getUrl(HomePage) }, "Home Page")
         )
       )
     }

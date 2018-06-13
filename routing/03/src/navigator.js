@@ -1,4 +1,5 @@
 import { StateNavigator } from "navigation"
+import { prefix } from "./constants"
 
 export const createNavigator = update => {
   let stateNavigator = null
@@ -20,7 +21,7 @@ export const createNavigator = update => {
       })
     },
     getComponent: pageId => componentMap[pageId],
-    getLink: (id, params) => stateNavigator.getNavigationLink(id, params),
+    getUrl: (id, params) => prefix + stateNavigator.getNavigationLink(id, params),
     navigateTo: (id, params) => stateNavigator.navigate(id, params),
     start: () => stateNavigator.start()
   }

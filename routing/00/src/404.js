@@ -1,5 +1,5 @@
 import { blankHref, HomePage } from "./constants"
-import { m, preventDefault } from "./utils"
+import { m } from "./utils"
 
 export const createNotFound = navigator => _update => {
   return {
@@ -9,7 +9,7 @@ export const createNotFound = navigator => _update => {
       m("div",
         m("a", {
           href: blankHref,
-          onClick: preventDefault(() => navigator.navigateTo(HomePage))
+          onClick: () => navigator.navigateTo(HomePage)
         }, "Home Page")
       )
     )
