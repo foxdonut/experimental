@@ -1,8 +1,7 @@
-import m from "mithril"
 import * as Main from "./index"
-import { prefix } from "./constants"
 import { trace } from "meiosis"
 import meiosisTracer from "meiosis-tracer"
+import m from "mithril"
 
 const tracerElement = document.createElement("div")
 tracerElement.id = "tracer"
@@ -13,10 +12,10 @@ const I = x => x
 trace({ update: Main.update, dataStreams: [ Main.models ], toUpdate: I })
 meiosisTracer({ selector: "#tracer" })
 
-const navigator = Main.App.navigator
+// Display the url in the browser's location bar.
 Main.models.map(model => {
-  const url = prefix + navigator.getUrl(model.pageId, model.params)
-  if (document.location.hash !== url) {
+  const url = model.url
+  if (url && document.location.hash !== url) {
     window.history.pushState({}, "", url)
   }
 })

@@ -1,5 +1,5 @@
-import m from "mithril"
 import { href, FormPage, HomePage } from "./constants"
+import m from "mithril"
 
 export const createList = navigator => _update => {
   return {
@@ -7,8 +7,7 @@ export const createList = navigator => _update => {
       m("div", "List Page"),
       m("div",
         ["a", "b"].map(itemId => m("button",
-          //{ onclick: () => navigator.navigateTo(FormPage, { itemId }) },
-          { onclick: () => m.route.set(navigator.getUrl(FormPage, { itemId })) },
+          { key: itemId, onclick: () => navigator.navigateTo(FormPage, { itemId }) },
           "Form ", itemId
         ))
       ),

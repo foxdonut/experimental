@@ -13,7 +13,7 @@ export const element = document.getElementById("app")
 m.route.prefix(prefix)
 m.route(element, "/", Object.keys(navigator.routes).reduce((result, route) => {
   result[route] = {
-    onmatch: params => navigator.navigateTo(navigator.routes[route], params),
+    onmatch: (params, url) => navigator.onnavigate(navigator.routes[route], params, url),
     render: () => m(App, { model: models() })
   }
   return result

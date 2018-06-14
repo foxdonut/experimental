@@ -6,4 +6,5 @@ export const ListPage = "ListPage"
 export const NotFoundPage = "NotFoundPage"
 
 export const prefix = "#!"
-export const href = link => ({ href: link, oncreate: m.route.link, onupdate: m.route.link })
+export const href = link =>
+  ({ href: link, oncreate: m.route.link, onupdate: m.route.link })

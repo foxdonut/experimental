@@ -1,5 +1,5 @@
-import m from "mithril"
 import { href, HomePage } from "./constants"
+import m from "mithril"
 
 export const createNotFound = navigator => _update => {
   return {

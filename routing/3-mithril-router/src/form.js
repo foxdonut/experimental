@@ -1,5 +1,5 @@
+import { href, HomePage, ListPage } from "./constants"
 import m from "mithril"
-import { href, FormPage, HomePage, ListPage } from "./constants"
 
 const items = {
   "a": "Article",
@@ -10,13 +10,11 @@ const loadData = itemId => new Promise(resolve =>
   setTimeout(() => resolve(items[itemId]), 5)
 )
 
-export const createForm = navigator => update => {
+export const createForm = navigator => _update => {
   return {
-    navigating: ({ itemId }) =>
-      loadData(itemId).then(item => {
-        update({ pageId: FormPage, params: { itemId }, item })
-      }),
-
+    navigating: ({ itemId }, navigate) => {
+      loadData(itemId).then(item => navigate({ item }))
+    },
     view: vnode => {
       const model = vnode.attrs.model
 
@@ -24,7 +22,7 @@ export const createForm = navigator => update => {
         m("div", "Form Page for item " + model.item),
         m("div",
           m("button",
-            { onclick: () => m.route.set(navigator.getUrl(ListPage)) },
+            { onclick: () => navigator.navigateTo(ListPage) },
             "List"
           )
         ),
