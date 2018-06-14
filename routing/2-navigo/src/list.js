@@ -1,4 +1,5 @@
-import { m, FormPage, HomePage } from "./constants"
+import { FormPage, HomePage } from "./constants"
+import { m } from "./utils"
 
 export const createList = navigator => _update => {
   return {

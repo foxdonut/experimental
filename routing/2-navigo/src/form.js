@@ -1,4 +1,5 @@
-import { m, FormPage, HomePage, ListPage } from "./constants"
+import { HomePage, ListPage } from "./constants"
+import { m } from "./utils"
 
 const items = {
   "a": "Article",
@@ -9,12 +10,11 @@ const loadData = itemId => new Promise(resolve =>
   setTimeout(() => resolve(items[itemId]), 5)
 )
 
-export const createForm = navigator => update => {
+export const createForm = navigator => _update => {
   return {
-    navigating: ({ itemId }) => {
-      loadData(itemId).then(item => {
-        update(model => Object.assign(model, { pageId: FormPage, params: { itemId }, item }))
-      })
+    navigating: ({ itemId }, navigate) => {
+      loadData(itemId).then(item =>
+        navigate(model => Object.assign(model, { item })))
     },
     view: model => {
       return m("div",

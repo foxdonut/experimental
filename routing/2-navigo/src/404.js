@@ -1,4 +1,5 @@
-import { m, HomePage } from "./constants"
+import { HomePage } from "./constants"
+import { m } from "./utils"
 
 export const createNotFound = navigator => _update => {
   return {

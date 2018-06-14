@@ -1,4 +1,5 @@
-import { m, ListPage } from "./constants"
+import { ListPage } from "./constants"
+import { m } from "./utils"
 
 export const createHome = navigator => _update => {
   return {

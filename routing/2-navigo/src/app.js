@@ -1,5 +1,6 @@
 import { createNavigator } from "./navigator"
-import { m, HomePage, ListPage, FormPage, NotFoundPage } from "./constants"
+import { HomePage, ListPage, FormPage } from "./constants"
+import { m } from "./utils"
 import { createHome } from "./home"
 import { createList } from "./list"
 import { createForm } from "./form"
@@ -11,9 +12,8 @@ export const createApp = update => {
   navigator.register([
     { key: HomePage, component: createHome(navigator)(update), route: "/" },
     { key: ListPage, component: createList(navigator)(update), route: "/list" },
-    { key: FormPage, component: createForm(navigator)(update), route: "/form/:itemId" },
-    { key: NotFoundPage, component: createNotFound(navigator)(update), route: "/*" }
-  ])
+    { key: FormPage, component: createForm(navigator)(update), route: "/form/:itemId" }
+  ], createNotFound(navigator)(update))
 
   navigator.start()
 
@@ -24,7 +24,7 @@ export const createApp = update => {
 
       return m("div",
         m("div", "Hello, world"),
-        Component && Component.view(model)
+        Component.view(model)
       )
     }
   }

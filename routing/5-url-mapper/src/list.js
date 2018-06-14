@@ -12,7 +12,7 @@ export const createList = navigator => _update => {
         ))
       ),
       m("div",
-        m("a", { href: navigator.getUrl(HomePage), }, "Home Page")
+        m("a", { href: navigator.getUrl(HomePage) }, "Home Page")
       )
     )
   }
