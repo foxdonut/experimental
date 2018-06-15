@@ -41,6 +41,7 @@ export const createNavigator = update => {
       document.location.href = getUrl(id, params)
     },
     handleUrl: url => {
+      url = url || "/"
       const matchedRoute = mapper.map(url, routeHandlerMap)
       if (matchedRoute) {
         matchedRoute.match(matchedRoute.values, url)
