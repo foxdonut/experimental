@@ -1,3 +1,4 @@
+import { Component } from "react"
 import { createNavigator } from "./navigator"
 import { HashRouter as Router, Route, Switch } from "react-router-dom"
 import { HomePage, ListPage, FormPage } from "./constants"
@@ -11,19 +12,27 @@ export const createApp = update => {
   const navigator = createNavigator()
 
   const routes = navigator.register([
-    { key: HomePage, component: createHome(navigator)(update), path: "/", exact: true },
-    { key: ListPage, component: createList(navigator)(update), path: "/list" },
-    { key: FormPage, component: createForm(navigator)(update), path: "/form/:itemId" }
+    { key: HomePage, view: createHome(navigator)(update), path: "/", exact: true },
+    { key: ListPage, view: createList(navigator)(update), path: "/list" },
+    { key: FormPage, view: createForm(navigator)(update), path: "/form/:itemId" }
   ], createNotFound(navigator)(update))
 
-  return {
-    // navigator,
-    view: _model =>
-      m(Router,
+  return class extends Component {
+    render() {
+      const model = this.props.model
+
+      return m(Router,
         m("div",
           m("div", "Hello, world"),
-          m(Switch, routes.map(route => m(Route, route)))
+          m(Switch, routes.map(route => {
+            route.render = (props) => {
+              props.model = model
+              return m(route.view, props)
+            }
+            return m(Route, route)
+          }))
         )
       )
+    }
   }
 }
