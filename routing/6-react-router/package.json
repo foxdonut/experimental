@@ -1,5 +1,5 @@
 {
-  "name": "routing-5-url-mapper",
+  "name": "routing-6-react-router",
   "version": "1.0.0",
   "description": "routing experimentation",
   "main": "src/index.js",
@@ -25,6 +25,7 @@
   "dependencies": {
     "flyd": "^0.2.6",
     "jsnox": "^2.1.3",
+    "path-to-regexp": "^2.2.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
     "react-router-dom": "^4.3.1"

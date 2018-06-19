@@ -7,8 +7,7 @@ export const createHome = navigator => _update => {
     m("div",
       m("div", "Home Page"),
       m("div",
-        //m("a", { href: navigator.getUrl(ListPage) }, "List Page")
-        m(Link, { to: "/list" }, "List Page")
+        m(Link, { to: navigator.getUrl(ListPage) }, "List Page")
       )
     )
 }
