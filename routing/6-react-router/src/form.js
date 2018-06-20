@@ -27,17 +27,19 @@ export const createForm = navigator => update => class extends Component {
   }
   render() {
     const { history, model } = this.props
-    return m("div",
-      m("div", "Form Page for item " + model.item),
+    return model.item ?
       m("div",
-        m("button",
-          { onClick: () => history.push(navigator.getUrl(ListPage)) },
-          "List"
+        m("div", "Form Page for item " + model.item),
+        m("div",
+          m("button",
+            { onClick: () => history.push(navigator.getUrl(ListPage)) },
+            "List"
+          )
+        ),
+        m("div",
+          m(Link, { to: navigator.getUrl(HomePage) }, "Home Page")
         )
-      ),
-      m("div",
-        m(Link, { to: navigator.getUrl(HomePage) }, "Home Page")
       )
-    )
+      : m("div", "Loading, please wait...")
   }
 }

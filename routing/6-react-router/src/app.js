@@ -12,9 +12,9 @@ export const createApp = update => {
   const navigator = createNavigator()
 
   const routes = navigator.register([
-    { key: HomePage, view: createHome(navigator)(update), path: "/", exact: true },
-    { key: ListPage, view: createList(navigator)(update), path: "/list" },
-    { key: FormPage, view: createForm(navigator)(update), path: "/form/:itemId" }
+    { key: HomePage, page: createHome(navigator)(update), path: "/", exact: true },
+    { key: ListPage, page: createList(navigator)(update), path: "/list" },
+    { key: FormPage, page: createForm(navigator)(update), path: "/form/:itemId" }
   ], createNotFound(navigator)(update))
 
   return class extends Component {
@@ -27,7 +27,7 @@ export const createApp = update => {
           m(Switch, routes.map(route => {
             route.render = (props) => {
               props.model = model
-              return m(route.view, props)
+              return m(route.page, props)
             }
             return m(Route, route)
           }))
