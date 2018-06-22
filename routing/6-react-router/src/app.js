@@ -25,7 +25,7 @@ export const createApp = update => {
         m("div",
           m("div", "Hello, world"),
           m(Switch, routes.map(route => {
-            route.render = (props) => {
+            route.render = props => {
               props.model = model
               return m(route.page, props)
             }
