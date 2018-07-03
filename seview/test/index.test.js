@@ -14,8 +14,6 @@ const basicChildren = ["div", { id: "test" }, [
   ["div", {}, "test2"]
 ]]
 
-console.log(h(basicChildren))
-
 export default {
   basicText: [
     h(basicText),
