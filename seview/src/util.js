@@ -106,6 +106,7 @@ export const nodeDef = node => {
   if (isObject(node[1])) {
     const attrs = node[1]
 
+    // Process class and className
     if (attrs["class"] !== undefined || attrs["className"] !== undefined) {
       const classAttr = attrs["class"] || attrs["className"]
       delete attrs["class"]
@@ -132,6 +133,19 @@ export const nodeDef = node => {
       }
     }
 
+    // Process events, which start with "on"
+    const events = {}
+    Object.keys(attrs).forEach(attr => {
+      if (attr.startsWith("on")) {
+        events[attr] = attrs[attr]
+        delete attrs[attr]
+      }
+    })
+    if (Object.keys(events).length > 0) {
+      result.events = events
+    }
+
+    // Add remaining attributes
     if (Object.keys(attrs).length > 0) {
       if (result.attrs === undefined) {
         result.attrs = attrs
@@ -141,18 +155,18 @@ export const nodeDef = node => {
       }
     }
   }
+  // No attrs, use second argument as rest
   else {
     rest = node[1]
     varArgsLimit = 2
   }
 
+  // Process children: varargs
   if (node.length > varArgsLimit) {
-    // Process children: varargs
     result.children = processChildren(node.slice(varArgsLimit - 1))
   }
+  // Process children: one child arg
   else {
-    // Process children: one child arg
-
     // Text node
     if (isString(rest)) {
       result.text = rest

@@ -168,10 +168,27 @@ export default {
       }
     ],
     classToggles: [
-      nodeDef(["button", { class: { "btn-primary": true, "btn-default": false }}]),
+      nodeDef(["button.btn", { class: { "btn-primary": true, "btn-default": false }}]),
       {
         tag: "button",
-        classes: ["btn-primary"]
+        classes: ["btn", "btn-primary"]
+      }
+    ],
+    classNameToggles: [
+      nodeDef(["button.btn", { className: { "btn-primary": true, "btn-default": false }}]),
+      {
+        tag: "button",
+        classes: ["btn", "btn-primary"]
+      }
+    ],
+    events: [
+      nodeDef(["button", { onClick: func, onBlur: func }]),
+      {
+        tag: "button",
+        events: {
+          onClick: func,
+          onBlur: func
+        }
       }
     ]
   }
