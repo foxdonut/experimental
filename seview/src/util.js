@@ -6,7 +6,7 @@ export const isFunction = x => typeof x === "function"
 // Credit: JSnoX https://github.com/af/JSnoX/blob/master/jsnox.js
 
 // matches "input", "input:text"
-const tagTypeRegex = /^([a-z1-6]+)(?:\:([a-z]+))?/
+const tagTypeRegex = /^([a-z1-6]+)(?::([a-z]+))?/
 
 // matches "#id", ".class", "[name=value]", "[required]"
 const propsRegex = /((?:#|\.|@)[\w-]+)|(\[.*?\])/g
@@ -20,7 +20,7 @@ returns tag properties: for example, "input:password#duck.quack.yellow[name=pwd]
   tag: "input",
   type: "password",
   id: "duck",
-  class: ["quack", "yellow"],
+  classes: ["quack", "yellow"],
   attrs: { name: "pwd", required: true }
 }
 */
@@ -50,10 +50,10 @@ export const getTagProperties = selector => {
         result.id = prop
       }
       else if (ch === ".") {
-        if (result.class === undefined) {
-          result.class = []
+        if (result.classes === undefined) {
+          result.classes = []
         }
-        result.class.push(prop)
+        result.classes.push(prop)
       }
       else if (ch === "[") {
         if (result.attrs === undefined) {

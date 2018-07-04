@@ -115,7 +115,7 @@ export default {
       getTagProperties(".btn"),
       {
         tag: "div",
-        class: ["btn"]
+        classes: ["btn"]
       }
     ],
     all: [
@@ -124,7 +124,7 @@ export default {
         tag: "input",
         type: "password",
         id: "duck",
-        class: ["quack", "yellow"],
+        classes: ["quack", "yellow"],
         attrs: { name: "pwd", required: true }
       }
     ]
