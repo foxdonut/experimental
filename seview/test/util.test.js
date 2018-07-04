@@ -127,6 +127,14 @@ export default {
         classes: ["quack", "yellow"],
         attrs: { name: "pwd", required: true }
       }
+    ],
+    extraTypesIgnored: [
+      getTagProperties("input:text:password.form-input"),
+      {
+        tag: "input",
+        type: "text",
+        classes: ["form-input"]
+      }
     ]
   }
 }
