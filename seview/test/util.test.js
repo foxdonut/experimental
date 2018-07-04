@@ -1,4 +1,4 @@
-import { isString, isArray, isObject, isFunction } from "../src/util"
+import { isString, isArray, isObject, isFunction, getTagProperties } from "../src/util"
 
 const string = "test"
 const object = { key: "value" }
@@ -108,6 +108,25 @@ export default {
     "false for undefined": [
       isFunction(undefined),
       false
+    ]
+  },
+  getTagProperties: {
+    divByDefault: [
+      getTagProperties(".btn"),
+      {
+        tag: "div",
+        class: ["btn"]
+      }
+    ],
+    all: [
+      getTagProperties("input:password#duck.quack.yellow[name=pwd][required]"),
+      {
+        tag: "input",
+        type: "password",
+        id: "duck",
+        class: ["quack", "yellow"],
+        attrs: { name: "pwd", required: true }
+      }
     ]
   }
 }
