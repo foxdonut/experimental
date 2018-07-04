@@ -139,12 +139,30 @@ export default {
   },
   nodeDef: {
     basicText: [
-      nodeDef(["div", { id: "test" }, "test"]),
+      nodeDef(["div", { width: "100%" }, "test"]),
       {
         tag: "div",
-        attrs: { id: "test" },
+        attrs: { width: "100%" },
         text: "test"
       }
+    ],
+    basicChildren: [
+      nodeDef(["div", { id: "test" }, [
+        ["div", "test1"],
+        ["div", "test2"]
+      ]]),
+      {
+        tag: "div",
+        id: "test",
+        children: [
+          { tag: "div", text: "test1" },
+          { tag: "div", text: "test2" }
+        ]
+      }
+    ],
+    justATag: [
+      nodeDef(["hr"]),
+      { tag: "hr" }
     ],
     combineAttrs: [
       nodeDef(["input[name=duck]", { value: "quack" }]),

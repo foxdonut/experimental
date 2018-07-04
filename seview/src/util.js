@@ -133,6 +133,12 @@ export const nodeDef = node => {
       }
     }
 
+    // Process id
+    if (attrs.id) {
+      result.id = attrs.id
+      delete attrs.id
+    }
+
     // Process events, which start with "on"
     const events = {}
     Object.keys(attrs).forEach(attr => {
