@@ -40,16 +40,11 @@ export default {
   ],
   justATag: [
     h(["hr"]),
-    {
-      selector: "hr"
-    }
+    { selector: "hr" }
   ],
   optionalAttrs: [
     h(["div", "test"]),
-    {
-      selector: "div",
-      text: "test"
-    }
+    { selector: "div", text: "test" }
   ],
   optionalAttrsChildren: [
     h(["div", [
@@ -59,27 +54,70 @@ export default {
     {
       selector: "div",
       children: [
-        {
-          selector: "div",
-          text: "test1"
-        },
-        {
-          selector: "div",
-          text: "test2"
-        }
+        { selector: "div", text: "test1" },
+        { selector: "div", text: "test2" }
+      ]
+    }
+  ],
+  basicVarArgs: [
+    h(["div", {},
+      ["div", "test1"],
+      ["div", "test2"]
+    ]),
+    {
+      selector: "div",
+      attributes: {},
+      children: [
+        { selector: "div", text: "test1" },
+        { selector: "div", text: "test2" }
+      ]
+    }
+  ],
+  varArgsNoAttrs: [
+    h(["div",
+      ["div", "test1"],
+      ["div", "test2"]
+    ]),
+    {
+      selector: "div",
+      children: [
+        { selector: "div", text: "test1" },
+        { selector: "div", text: "test2" }
+      ]
+    }
+  ],
+  oneVarArg: [
+    h(["div",
+      ["div", "test1"]
+    ]),
+    {
+      selector: "div",
+      children: [
+        { selector: "div", text: "test1" }
+      ]
+    }
+  ],
+  mixedChildrenVarArgs: [
+    h(["div",
+      "text 1",
+      ["b", "in bold"]
+    ]),
+    {
+      selector: "div",
+      children: [
+        { text: "text 1" },
+        { selector: "b", text: "in bold" }
       ]
     }
   ],
   mixedChildrenArray: [
     h(["div", [
-      "text 1",
       ["b", "in bold"],
       "text 2"
     ]]),
     {
       selector: "div",
       children: [
-        { text: "text 1" },
         { selector: "b", text: "in bold" },
         { text: "text 2" }
       ]
