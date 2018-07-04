@@ -70,56 +70,18 @@ export default {
       ]
     }
   ],
-  basicVarArgs: [
-    h(["div", {},
-      ["div", "test1"],
-      ["div", "test2"]
-    ]),
-    {
-      selector: "div",
-      attributes: {},
-      children: [
-        {
-          selector: "div",
-          text: "test1"
-        },
-        {
-          selector: "div",
-          text: "test2"
-        }
-      ]
-    }
-  ],
-  varArgsNoAttrs: [
-    h(["div",
-      ["div", "test1"],
-      ["div", "test2"]
-    ]),
+  mixedChildrenArray: [
+    h(["div", [
+      "text 1",
+      ["b", "in bold"],
+      "text 2"
+    ]]),
     {
       selector: "div",
       children: [
-        {
-          selector: "div",
-          text: "test1"
-        },
-        {
-          selector: "div",
-          text: "test2"
-        }
-      ]
-    }
-  ],
-  oneVarArg: [
-    h(["div",
-      ["div", "test1"]
-    ]),
-    {
-      selector: "div",
-      children: [
-        {
-          selector: "div",
-          text: "test1"
-        }
+        { text: "text 1" },
+        { selector: "b", text: "in bold" },
+        { text: "text 2" }
       ]
     }
   ]
