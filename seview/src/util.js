@@ -92,7 +92,7 @@ const processChildren = rest => {
 export const nodeDef = node => {
   // Text node
   if (isString(node)) {
-    return { text: node }
+    return node
   }
 
   // Tag

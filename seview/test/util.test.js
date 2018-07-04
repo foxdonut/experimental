@@ -164,6 +164,19 @@ export default {
       nodeDef(["hr"]),
       { tag: "hr" }
     ],
+    mixedChildrenVarArgs: [
+      nodeDef(["div",
+        "text 1",
+        ["b", "in bold"]
+      ]),
+      {
+        tag: "div",
+        children: [
+          "text 1",
+          { tag: "b", text: "in bold" }
+        ]
+      }
+    ],
     combineAttrs: [
       nodeDef(["input[name=duck]", { value: "quack" }]),
       {
