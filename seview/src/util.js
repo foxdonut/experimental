@@ -67,3 +67,101 @@ export const getTagProperties = selector => {
 
   return result
 }
+
+/*
+returns node definition, expanding on the above tag properties and adding to obtain:
+{
+  tag: "input",
+  type: "password",
+  id: "duck",
+  classes: ["quack", "yellow"],
+  attrs: { name: "pwd", required: true },
+  text: "some text",
+  events: { onClick: ..., ... },
+  children: [ { tag: ... }, ... ]
+}
+*/
+const processChildren = rest => {
+  const ch = []
+  rest.forEach(child => {
+    ch.push(nodeDef(child))
+  })
+  return ch
+}
+
+export const nodeDef = node => {
+  // Text node
+  if (isString(node)) {
+    return { text: node }
+  }
+
+  // Tag
+  let rest = node[2]
+  let varArgsLimit = 3
+
+  // Process tag
+  const result = getTagProperties(node[0])
+
+  // Process attrs
+  if (isObject(node[1])) {
+    const attrs = node[1]
+
+    if (attrs["class"] !== undefined || attrs["className"] !== undefined) {
+      const classAttr = attrs["class"] || attrs["className"]
+      delete attrs["class"]
+      delete attrs["className"]
+
+      let addClasses = []
+      if (isString(classAttr)) {
+        addClasses = classAttr.split(" ")
+      }
+      else if (isObject(classAttr)) {
+        Object.keys(classAttr).forEach(key => {
+          if (classAttr[key]) {
+            addClasses.push(key)
+          }
+        })
+      }
+      if (addClasses.length > 0) {
+        if (result.classes === undefined) {
+          result.classes = addClasses
+        }
+        else {
+          result.classes = result.classes.concat(addClasses)
+        }
+      }
+    }
+
+    if (Object.keys(attrs).length > 0) {
+      if (result.attrs === undefined) {
+        result.attrs = attrs
+      }
+      else {
+        result.attrs = Object.assign(result.attrs, attrs)
+      }
+    }
+  }
+  else {
+    rest = node[1]
+    varArgsLimit = 2
+  }
+
+  if (node.length > varArgsLimit) {
+    // Process children: varargs
+    result.children = processChildren(node.slice(varArgsLimit - 1))
+  }
+  else {
+    // Process children: one child arg
+
+    // Text node
+    if (isString(rest)) {
+      result.text = rest
+    }
+
+    if (isArray(rest)) {
+      // One child node vs Array of children
+      result.children = processChildren( isString(rest[0]) ? [ rest ] : rest )
+    }
+  }
+  return result
+}

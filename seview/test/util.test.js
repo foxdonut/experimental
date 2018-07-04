@@ -1,4 +1,4 @@
-import { isString, isArray, isObject, isFunction, getTagProperties } from "../src/util"
+import { isString, isArray, isObject, isFunction, getTagProperties, nodeDef } from "../src/util"
 
 const string = "test"
 const object = { key: "value" }
@@ -134,6 +134,44 @@ export default {
         tag: "input",
         type: "text",
         classes: ["form-input"]
+      }
+    ]
+  },
+  nodeDef: {
+    basicText: [
+      nodeDef(["div", { id: "test" }, "test"]),
+      {
+        tag: "div",
+        attrs: { id: "test" },
+        text: "test"
+      }
+    ],
+    combineAttrs: [
+      nodeDef(["input[name=duck]", { value: "quack" }]),
+      {
+        tag: "input",
+        attrs: { name: "duck", value: "quack" }
+      }
+    ],
+    combineClass: [
+      nodeDef(["button.btn", { class: "btn-default other" }]),
+      {
+        tag: "button",
+        classes: ["btn", "btn-default", "other"]
+      }
+    ],
+    combineClassName: [
+      nodeDef(["button.btn", { className: "btn-default other" }]),
+      {
+        tag: "button",
+        classes: ["btn", "btn-default", "other"]
+      }
+    ],
+    classToggles: [
+      nodeDef(["button", { class: { "btn-primary": true, "btn-default": false }}]),
+      {
+        tag: "button",
+        classes: ["btn-primary"]
       }
     ]
   }
