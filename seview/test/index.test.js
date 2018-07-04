@@ -1,19 +1,27 @@
 import { sv } from "../src"
 
-const tag = (node, tag) => Object.assign(node, { selector: tag })
-const attrs = (node, attrs) => Object.assign(node, { attributes: attrs })
-const children = (node, children) => Object.assign(node, { children })
-const text = (node, text) => Object.assign(node, { text })
+const transform = node => {
+  const children = node.children || []
+  if (node.text) {
+    children.push(node.text)
+  }
+  const childrenObj = children.length > 0 ? { children } : {}
+  const idObj = node.id ? { id: node.id } : {}
 
-const h = sv({ tag, attrs, children, text })
+  return {
+    type: node.tag,
+    props: Object.assign({}, node.attrs, idObj, childrenObj )
+  }
+}
+
+const h = sv(transform)
 
 export default {
   basicText: [
     h(["div", { id: "test" }, "test"]),
     {
-      selector: "div",
-      attributes: { id: "test" },
-      text: "test"
+      type: "div",
+      props: { id: "test", children: ["test"] }
     }
   ],
   basicChildren: [
@@ -22,29 +30,23 @@ export default {
       ["div", {}, "test2"]
     ]]),
     {
-      selector: "div",
-      attributes: { id: "test" },
-      children: [
-        {
-          selector: "div",
-          attributes: {},
-          text: "test1"
-        },
-        {
-          selector: "div",
-          attributes: {},
-          text: "test2"
-        }
-      ]
+      type: "div",
+      props: {
+        id: "test",
+        children: [
+          { type: "div", props: { children: ["test1"] } },
+          { type: "div", props: { children: ["test2"] } }
+        ]
+      }
     }
   ],
   justATag: [
     h(["hr"]),
-    { selector: "hr" }
+    { type: "hr", props: {} }
   ],
   optionalAttrs: [
     h(["div", "test"]),
-    { selector: "div", text: "test" }
+    { type: "div", props: { children: ["test"] } }
   ],
   optionalAttrsChildren: [
     h(["div", [
@@ -52,12 +54,13 @@ export default {
       ["div", "test2"]
     ]]),
     {
-      selector: "div",
-      children: [
-        { selector: "div", text: "test1" },
-        { selector: "div", text: "test2" }
-      ]
+      type: "div",
+      props: { children: [
+        { type: "div", props: { children: ["test1"] } },
+        { type: "div", props: { children: ["test2"] } }
+      ] }
     }
+  /*
   ],
   basicVarArgs: [
     h(["div", {},
@@ -65,11 +68,11 @@ export default {
       ["div", "test2"]
     ]),
     {
-      selector: "div",
+      type: "div",
       attributes: {},
       children: [
-        { selector: "div", text: "test1" },
-        { selector: "div", text: "test2" }
+        { type: "div", text: "test1" },
+        { type: "div", text: "test2" }
       ]
     }
   ],
@@ -79,10 +82,10 @@ export default {
       ["div", "test2"]
     ]),
     {
-      selector: "div",
+      type: "div",
       children: [
-        { selector: "div", text: "test1" },
-        { selector: "div", text: "test2" }
+        { type: "div", text: "test1" },
+        { type: "div", text: "test2" }
       ]
     }
   ],
@@ -91,9 +94,9 @@ export default {
       ["div", "test1"]
     ]),
     {
-      selector: "div",
+      type: "div",
       children: [
-        { selector: "div", text: "test1" }
+        { type: "div", text: "test1" }
       ]
     }
   ],
@@ -103,10 +106,10 @@ export default {
       ["b", "in bold"]
     ]),
     {
-      selector: "div",
+      type: "div",
       children: [
         { text: "text 1" },
-        { selector: "b", text: "in bold" }
+        { type: "b", text: "in bold" }
       ]
     }
   ],
@@ -116,11 +119,12 @@ export default {
       "text 2"
     ]]),
     {
-      selector: "div",
+      type: "div",
       children: [
-        { selector: "b", text: "in bold" },
+        { type: "b", text: "in bold" },
         { text: "text 2" }
       ]
     }
+  */
   ]
 }
