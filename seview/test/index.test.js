@@ -1,20 +1,22 @@
-import { sv } from "../src"
+const { mapKeys, sv } = require("../src/index")
 
 const transform = node => {
   const children = node.children || []
-  if (node.text) {
-    children.push(node.text)
-  }
   const childrenObj = children.length > 0 ? { children } : {}
-  const idObj = node.id ? { id: node.id } : {}
 
   return {
     type: node.tag,
-    props: Object.assign({}, node.attrs, idObj, childrenObj )
+    props: Object.assign({}, node.attrs, childrenObj )
   }
 }
 
 const h = sv(transform)
+
+const p = sv(mapKeys({
+  tag: "nodeName",
+  attrs: "attributes",
+  children: "children"
+}))
 
 export default {
   basicText: [
@@ -60,71 +62,95 @@ export default {
         { type: "div", props: { children: ["test2"] } }
       ] }
     }
-  /*
   ],
   basicVarArgs: [
-    h(["div", {},
+    p(["div", {},
       ["div", "test1"],
       ["div", "test2"]
     ]),
     {
-      type: "div",
-      attributes: {},
+      nodeName: "div",
       children: [
-        { type: "div", text: "test1" },
-        { type: "div", text: "test2" }
+        { nodeName: "div", children: ["test1"] },
+        { nodeName: "div", children: ["test2"] }
       ]
     }
   ],
   varArgsNoAttrs: [
-    h(["div",
+    p(["div",
       ["div", "test1"],
       ["div", "test2"]
     ]),
     {
-      type: "div",
+      nodeName: "div",
       children: [
-        { type: "div", text: "test1" },
-        { type: "div", text: "test2" }
+        { nodeName: "div", children: ["test1"] },
+        { nodeName: "div", children: ["test2"] }
       ]
     }
   ],
   oneVarArg: [
-    h(["div",
+    p(["div",
       ["div", "test1"]
     ]),
     {
-      type: "div",
+      nodeName: "div",
       children: [
-        { type: "div", text: "test1" }
+        { nodeName: "div", children: ["test1"] }
       ]
     }
   ],
   mixedChildrenVarArgs: [
-    h(["div",
+    p(["div",
       "text 1",
       ["b", "in bold"]
     ]),
     {
-      type: "div",
+      nodeName: "div",
       children: [
-        { text: "text 1" },
-        { type: "b", text: "in bold" }
+        "text 1",
+        { nodeName: "b", children: ["in bold"] }
       ]
     }
   ],
   mixedChildrenArray: [
-    h(["div", [
+    p(["div", [
       ["b", "in bold"],
       "text 2"
     ]]),
     {
-      type: "div",
+      nodeName: "div",
       children: [
-        { type: "b", text: "in bold" },
-        { text: "text 2" }
+        { nodeName: "b", children: ["in bold"] },
+        "text 2"
       ]
     }
-  */
+  ],
+  deeplyNestedChildren: [
+    p(["div",
+      ["div",
+        ["input:checkbox#sports", { checked: true }],
+        ["label", { htmlFor: "sports" }, "Sports"]
+      ]
+    ]),
+    {
+      nodeName: "div",
+      children: [
+        {
+          nodeName: "div",
+          children: [
+            {
+              nodeName: "input",
+              attributes: { type: "checkbox", id: "sports", checked: true }
+            },
+            {
+              nodeName: "label",
+              attributes: { htmlFor: "sports" },
+              children: ["Sports"]
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

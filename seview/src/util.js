@@ -1,7 +1,49 @@
 export const isString = x => typeof x === "string"
+export const isNumber = x => typeof x === "number"
+export const isBoolean = x => typeof x === "boolean"
 export const isArray = x => Array.isArray(x)
 export const isObject = x => typeof x === "object" && !isArray(x) && x !== null && x !== undefined
 export const isFunction = x => typeof x === "function"
+
+export const getString = value => {
+  let result = undefined
+
+  if (isString(value) && value.length > 0) {
+    result = value
+  }
+  else if (isNumber(value)) {
+    result = String(value)
+  }
+  else if (isBoolean(value) && value) {
+    result = String(value)
+  }
+  return result
+}
+
+export const get = (object, path) =>
+  object == null
+    ? undefined
+    : path.length === 1
+      ? object[path[0]]
+      : get(object[path[0]], path.slice(1))
+
+export const set = (object, path, value) => {
+  if (path.length === 1) {
+    if (isObject(object[path[0]])) {
+      Object.assign(object[path[0]], value)
+    }
+    else {
+      object[path[0]] = value
+    }
+  }
+  else {
+    if (object[[path[0]]] == null) {
+      object[[path[0]]] = {}
+    }
+    set(object[path[0]], path.slice(1), value)
+  }
+  return object
+}
 
 // Credit: JSnoX https://github.com/af/JSnoX/blob/master/jsnox.js
 
@@ -18,10 +60,8 @@ const attrRegex = /\[([\w-]+)(?:=([^\]]+))?\]/
 returns tag properties: for example, "input:password#duck.quack.yellow[name=pwd][required]"
 {
   tag: "input",
-  type: "password",
-  id: "duck",
-  classes: ["quack", "yellow"],
-  attrs: { name: "pwd", required: true }
+  className: "quack yellow",
+  attrs: { type: "password", id: "duck", name: "pwd", required: true }
 }
 */
 export const getTagProperties = selector => {
@@ -36,33 +76,33 @@ export const getTagProperties = selector => {
   result.tag = tagType[1]
 
   if (tagType[2]) {
-    result.type = tagType[2]
+    result.attrs = { type: tagType[2] }
   }
 
   const tagProps = selector.match(propsRegex)
 
   if (tagProps) {
+    const classes =[]
+
     tagProps.forEach(tagProp => {
       const ch = tagProp[0]
       const prop = tagProp.slice(1)
 
       if (ch === "#") {
-        result.id = prop
+        set(result, ["attrs", "id"], prop)
       }
       else if (ch === ".") {
-        if (result.classes === undefined) {
-          result.classes = []
-        }
-        result.classes.push(prop)
+        classes.push(prop)
       }
       else if (ch === "[") {
-        if (result.attrs === undefined) {
-          result.attrs = {}
-        }
         const attrs = tagProp.match(attrRegex)
-        result.attrs[attrs[1]] = (attrs[2] || true)
+        set(result, ["attrs", attrs[1]], (attrs[2] || true))
       }
     })
+
+    if (classes.length > 0) {
+      set(result, ["attrs", "className"], classes.join(" "))
+    }
   }
 
   return result
@@ -72,29 +112,26 @@ export const getTagProperties = selector => {
 returns node definition, expanding on the above tag properties and adding to obtain:
 {
   tag: "input",
-  type: "password",
-  id: "duck",
-  classes: ["quack", "yellow"],
-  attrs: { name: "pwd", required: true },
-  text: "some text",
-  events: { onClick: ..., ... },
-  children: [ { tag: ... }, ... ]
+  className: "quack yellow",
+  attrs: { type: "password", id: "duck", name: "pwd", required: true, onClick: ... },
+  children: [ { tag: ... }, "text", ... ]
 }
 */
 const processChildren = rest => {
   const ch = []
   rest.forEach(child => {
-    ch.push(nodeDef(child))
+    // Text node
+    if (getString(child)) {
+      ch.push(getString(child))
+    }
+    else if (isArray(child)) {
+      ch.push(nodeDef(child))
+    }
   })
   return ch
 }
 
 export const nodeDef = node => {
-  // Text node
-  if (isString(node)) {
-    return node
-  }
-
   // Tag
   let rest = node[2]
   let varArgsLimit = 3
@@ -106,10 +143,9 @@ export const nodeDef = node => {
   if (isObject(node[1])) {
     const attrs = node[1]
 
-    // Process class and className
-    if (attrs["class"] !== undefined || attrs["className"] !== undefined) {
-      const classAttr = attrs["class"] || attrs["className"]
-      delete attrs["class"]
+    // Process className
+    if (attrs["className"] !== undefined) {
+      const classAttr = attrs["className"]
       delete attrs["className"]
 
       let addClasses = []
@@ -124,31 +160,13 @@ export const nodeDef = node => {
         })
       }
       if (addClasses.length > 0) {
-        if (result.classes === undefined) {
-          result.classes = addClasses
-        }
-        else {
-          result.classes = result.classes.concat(addClasses)
-        }
+        const existingClassName = get(result, ["attrs", "className"])
+        const addClassName = addClasses.join(" ")
+        set(result, ["attrs", "className"],
+          (existingClassName ? existingClassName + " " : "")
+          + addClassName
+        )
       }
-    }
-
-    // Process id
-    if (attrs.id) {
-      result.id = attrs.id
-      delete attrs.id
-    }
-
-    // Process events, which start with "on"
-    const events = {}
-    Object.keys(attrs).forEach(attr => {
-      if (attr.startsWith("on")) {
-        events[attr] = attrs[attr]
-        delete attrs[attr]
-      }
-    })
-    if (Object.keys(events).length > 0) {
-      result.events = events
     }
 
     // Add remaining attributes
@@ -174,8 +192,8 @@ export const nodeDef = node => {
   // Process children: one child arg
   else {
     // Text node
-    if (isString(rest)) {
-      result.text = rest
+    if (getString(rest)) {
+      result.children = [ getString(rest) ]
     }
 
     if (isArray(rest)) {
@@ -183,5 +201,20 @@ export const nodeDef = node => {
       result.children = processChildren( isString(rest[0]) ? [ rest ] : rest )
     }
   }
+  return result
+}
+
+export const mapKeys = mappings => object => {
+  const result = {}
+
+  Object.keys(mappings).forEach(key => {
+    const from = key.split(".")
+    const to = mappings[key].split(".")
+    const value = get(object, from)
+    if (value != null) {
+      set(result, to, value)
+    }
+  })
+
   return result
 }

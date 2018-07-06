@@ -1,6 +1,9 @@
-import { isString, isArray, isObject, isFunction, getTagProperties, nodeDef } from "../src/util"
+import { isString, isNumber, isBoolean, isArray, isObject, isFunction, get, set,
+  getString, getTagProperties, nodeDef, mapKeys } from "../src/util"
 
 const string = "test"
+const number = 42
+const boolean = false
 const object = { key: "value" }
 const array = ["div", "test"]
 const func = x => x
@@ -10,6 +13,14 @@ export default {
     "true for string": [
       isString(string),
       true
+    ],
+    "false for number": [
+      isString(number),
+      false
+    ],
+    "false for boolean": [
+      isString(boolean),
+      false
     ],
     "false for object": [
       isString(object),
@@ -32,9 +43,85 @@ export default {
       false
     ]
   },
+  isNumber: {
+    "false for string": [
+      isNumber(string),
+      false
+    ],
+    "true for number": [
+      isNumber(number),
+      true
+    ],
+    "false for boolean": [
+      isNumber(boolean),
+      false
+    ],
+    "false for object": [
+      isNumber(object),
+      false
+    ],
+    "false for array": [
+      isNumber(array),
+      false
+    ],
+    "false for function": [
+      isNumber(func),
+      false
+    ],
+    "false for null": [
+      isNumber(null),
+      false
+    ],
+    "false for undefined": [
+      isNumber(undefined),
+      false
+    ]
+  },
+  isBoolean: {
+    "false for string": [
+      isBoolean(string),
+      false
+    ],
+    "false for number": [
+      isBoolean(number),
+      false
+    ],
+    "true for boolean": [
+      isBoolean(boolean),
+      true
+    ],
+    "false for object": [
+      isBoolean(object),
+      false
+    ],
+    "false for array": [
+      isBoolean(array),
+      false
+    ],
+    "false for function": [
+      isBoolean(func),
+      false
+    ],
+    "false for null": [
+      isBoolean(null),
+      false
+    ],
+    "false for undefined": [
+      isBoolean(undefined),
+      false
+    ]
+  },
   isArray: {
     "false for string": [
       isArray(string),
+      false
+    ],
+    "false for number": [
+      isArray(number),
+      false
+    ],
+    "false for boolean": [
+      isArray(boolean),
       false
     ],
     "false for object": [
@@ -63,6 +150,14 @@ export default {
       isObject(string),
       false
     ],
+    "false for number": [
+      isObject(number),
+      false
+    ],
+    "false for boolean": [
+      isObject(boolean),
+      false
+    ],
     "true for object": [
       isObject(object),
       true
@@ -89,7 +184,15 @@ export default {
       isFunction(string),
       false
     ],
-    "true for object": [
+    "false for number": [
+      isFunction(number),
+      false
+    ],
+    "false for boolean": [
+      isFunction(boolean),
+      false
+    ],
+    "false for object": [
       isFunction(object),
       false
     ],
@@ -110,30 +213,80 @@ export default {
       false
     ]
   },
+  getString: {
+    basic: [
+      getString(string),
+      string
+    ],
+    excluded: [
+      [ getString(undefined), getString(null), getString(""), getString(false), getString(["test"]), getString({ id: "test" }) ],
+      [ undefined, undefined, undefined, undefined, undefined, undefined ]
+    ],
+    included: [
+      [ getString(42), getString(NaN), getString(Infinity), getString(true) ],
+      [ "42", "NaN", "Infinity", "true" ]
+    ]
+  },
+  get: {
+    basic: [
+      get({ tag: "div" }, ["tag"]),
+      "div"
+    ],
+    deep: [
+      get({ attrs: { onClick: func } }, ["attrs", "onClick"]),
+      func
+    ],
+    noValue: [
+      get({ tag: "div" }, ["type"]),
+      undefined
+    ],
+    noPath: [
+      get({ tag: "div" }, ["type", "value"]),
+      undefined
+    ]
+  },
+  set: {
+    basic: [
+      set({ tag: "div" }, ["tag"], "span"),
+      { tag: "span" }
+    ],
+    deep: [
+      set({ attrs: { onClick: null } }, ["attrs", "onClick"], func),
+      { attrs: { onClick: func } }
+    ],
+    noValue: [
+      set({ tag: "input" }, ["type"], "password"),
+      { tag: "input", type: "password" }
+    ],
+    noPath: [
+      set({ tag: "input" }, ["attrs", "type"], "password"),
+      { tag: "input", attrs: { type: "password" } }
+    ],
+    merge: [
+      set({ tag: "input", props: { id: "test" } }, ["props", "children"], ["test"]),
+      { tag: "input", props: { id: "test", children: ["test"] } }
+    ]
+  },
   getTagProperties: {
     divByDefault: [
       getTagProperties(".btn"),
       {
         tag: "div",
-        classes: ["btn"]
+        attrs: { className: "btn" }
       }
     ],
     all: [
       getTagProperties("input:password#duck.quack.yellow[name=pwd][required]"),
       {
         tag: "input",
-        type: "password",
-        id: "duck",
-        classes: ["quack", "yellow"],
-        attrs: { name: "pwd", required: true }
+        attrs: { type: "password", id: "duck", className: "quack yellow", name: "pwd", required: true }
       }
     ],
     extraTypesIgnored: [
       getTagProperties("input:text:password.form-input"),
       {
         tag: "input",
-        type: "text",
-        classes: ["form-input"]
+        attrs: { type: "text", className: "form-input" }
       }
     ]
   },
@@ -143,7 +296,7 @@ export default {
       {
         tag: "div",
         attrs: { width: "100%" },
-        text: "test"
+        children: ["test"]
       }
     ],
     basicChildren: [
@@ -153,10 +306,10 @@ export default {
       ]]),
       {
         tag: "div",
-        id: "test",
+        attrs: { id: "test" },
         children: [
-          { tag: "div", text: "test1" },
-          { tag: "div", text: "test2" }
+          { tag: "div", children: ["test1"] },
+          { tag: "div", children: ["test2"] }
         ]
       }
     ],
@@ -164,16 +317,43 @@ export default {
       nodeDef(["hr"]),
       { tag: "hr" }
     ],
+    tagWithNumber: [
+      nodeDef(["span", 0]),
+      { tag: "span", children: ["0"] }
+    ],
+    oneVarArg: [
+      nodeDef(["div",
+        ["div", "test1"]
+      ]),
+      {
+        tag: "div",
+        children: [
+          { tag: "div", children: ["test1"] }
+        ]
+      }
+    ],
     mixedChildrenVarArgs: [
       nodeDef(["div",
         "text 1",
+        42,
+        undefined,
+        null,
+        false,
+        "",
+        true,
+        NaN,
+        Infinity,
         ["b", "in bold"]
       ]),
       {
         tag: "div",
         children: [
           "text 1",
-          { tag: "b", text: "in bold" }
+          "42",
+          "true",
+          "NaN",
+          "Infinity",
+          { tag: "b", children: ["in bold"] }
         ]
       }
     ],
@@ -184,42 +364,73 @@ export default {
         attrs: { name: "duck", value: "quack" }
       }
     ],
-    combineClass: [
-      nodeDef(["button.btn", { class: "btn-default other" }]),
-      {
-        tag: "button",
-        classes: ["btn", "btn-default", "other"]
-      }
-    ],
     combineClassName: [
       nodeDef(["button.btn", { className: "btn-default other" }]),
       {
         tag: "button",
-        classes: ["btn", "btn-default", "other"]
-      }
-    ],
-    classToggles: [
-      nodeDef(["button.btn", { class: { "btn-primary": true, "btn-default": false }}]),
-      {
-        tag: "button",
-        classes: ["btn", "btn-primary"]
+        attrs: { className: "btn btn-default other" }
       }
     ],
     classNameToggles: [
       nodeDef(["button.btn", { className: { "btn-primary": true, "btn-default": false }}]),
       {
         tag: "button",
-        classes: ["btn", "btn-primary"]
+        attrs: { className: "btn btn-primary" }
       }
     ],
     events: [
       nodeDef(["button", { onClick: func, onBlur: func }]),
       {
         tag: "button",
-        events: {
+        attrs: {
           onClick: func,
           onBlur: func
         }
+      }
+    ]
+  },
+  mapKeys: {
+    basic: [
+      mapKeys({
+        tag: "type",
+        attrs: "props",
+        children: "props.children"
+      })({
+        tag: "div",
+        attrs: { className: "duck yellow" },
+        children: ["text"]
+      }),
+      {
+        type: "div",
+        props: {
+          className: "duck yellow",
+          children: ["text"]
+        }
+      }
+    ],
+    mappedOnly: [
+      mapKeys({
+        tag: "nodeName",
+        attrs: "attributes"
+      })({
+        tag: "div",
+        attrs: { id: "test" },
+        children: ["test"]
+      }),
+      {
+        nodeName: "div",
+        attributes: { id: "test" }
+      }
+    ],
+    mapOnlyPresent: [
+      mapKeys({
+        tag: "nodeName",
+        attrs: "attributes"
+      })({
+        tag: "hr"
+      }),
+      {
+        nodeName: "hr"
       }
     ]
   }
