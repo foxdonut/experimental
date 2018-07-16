@@ -9,11 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crocks": "^0.8.2",
-    "domvm": "^3.2.5",
-    "hapi": "^16.6.2",
-    "hapi-auth-bearer-token": "^5.1.0",
-    "inert": "^4.2.1",
-    "sqlite3": "^3.1.13"
+    "crocks": "^0.9.4",
+    "domvm": "^3.3.3",
+    "hapi": "^17.5.2",
+    "hapi-auth-bearer-token": "^6.0.1",
+    "inert": "^5.1.0",
+    "sqlite3": "^4.0.2"
   }
 }
