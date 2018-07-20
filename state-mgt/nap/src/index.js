@@ -10,10 +10,10 @@ const models = stream.scan(O, app.model(), update)
 const states = stream()
 models.map(model => {
   if (model.loadMore) {
-      setTimeout(() => {
-        model.employeeList.push({ name: "Claude Ricard", salary: 350 })
-        states(model)
-      }, 500)
+    setTimeout(() => {
+      model.employeeList.push({ name: "Claude Ricard", salary: 350 })
+      states(model)
+    }, 500)
   }
   else {
     states(model)
