@@ -4,18 +4,21 @@
 (def nest-patch (object path)
   (var result {})
   (set result (get path 0)
-    (ternary (= path.length 1) (O object) (O (nest-patch object (path.slice 1))))))
+    (ternary (= path.length 1)
+      (O object)
+      (O (nest-patch object (path.slice 1))))))
 
 (def nest-update (update path)
   (#(patch) (update (nest-patch patch path))))
 
 (def nest (create update path)
-  (fp.thrush (create (nest-update update path))
+  (var component (create (nest-update update path)))
+  (fp.thrush component
     (fp.pipe
-      (fp.merge {})
-      (fp.when (exists? (fp.prop "model"))
-        (fp.assoc "model" (#() (nest-path (component.model) path))))
-      (fp.when (exists? (fp.prop "view"))
+      (fp.assign {})
+      (fp.when (fp.has-prop "model")
+        (fp.assoc "model" (#() (nest-patch (component.model) path))))
+      (fp.when (fp.has-prop "view")
         (fp.assoc "view" (#(model) (component.view (fp.path path model))))))))
 
 (set module 'exports {

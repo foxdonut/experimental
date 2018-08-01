@@ -1,7 +1,10 @@
-(def create-view ()
+(def create-view (components)
   (#(model)
+    (console.log "MODEL:" model)
     ["form"
       ["fieldset"
+        (components.air-temp.view model)
+        (components.water-temp.view model)
         ["button" "Save"]]
       ["span" "Saved:"]]
   ))

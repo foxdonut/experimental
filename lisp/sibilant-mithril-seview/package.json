@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "crocks": "^0.10.1",
     "mithril": "^1.1.6",
     "mithril-stream": "^1.1.0",
     "patchinko": "^3.2.1",

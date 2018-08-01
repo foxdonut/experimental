@@ -1,9 +1,10 @@
 (var crocks (require "crocks"))
 
 (set module 'exports {
+  assign (crocks.flip crocks.assign)
   assoc crocks.assoc
   compose crocks.compose
-  merge crocks.merge
+  has-prop crocks.hasProp
   path (crocks.propPathOr null)
   pipe crocks.pipe
   prop (crocks.propOr null)

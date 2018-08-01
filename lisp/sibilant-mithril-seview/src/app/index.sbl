@@ -1,8 +1,19 @@
+(var O (require "patchinko/overloaded"))
 (var { create-view } (require "./view"))
+(var { create-temperature } (require "../temperature"))
+(var { nest } (require "../util/nest"))
 
-(def create-app (update) {
-  view (create-view)
-})
+(def create-app (update)
+  (var components {
+    air-temp (nest (create-temperature "Air") update ["temperature" "air"])
+    water-temp (nest (create-temperature "Water") update ["temperature" "water"])
+  })
+  {
+    model (#() (O {}
+      (components.air-temp.model)
+      (components.water-temp.model)))
+    view (create-view components)
+  })
 
 (set module 'exports {
   create-app create-app

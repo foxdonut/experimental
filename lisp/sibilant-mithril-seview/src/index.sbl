@@ -7,7 +7,7 @@
 
 (var update (stream))
 (var app (create-app update))
-;(var models (stream.scan O (app.model) update))
-(var models (stream.scan O {} update))
+(var models (stream.scan O (app.model) update))
+(console.log "initial" (app.model))
 (var element (document.getElementById "app"))
 (models.map (#(model) (m.render element (h (app.view model)))))

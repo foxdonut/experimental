@@ -1,0 +1,12 @@
+(var { create-actions } (require "./actions"))
+(var { create-view } (require "./view"))
+
+(def create-temperature (label)
+  (#(update) {
+    model (#() { label label value 21 units "C" })
+    view (create-view (create-actions update))
+  }))
+
+(set module 'exports {
+  create-temperature create-temperature
+})
