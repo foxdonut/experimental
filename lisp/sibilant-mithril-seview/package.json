@@ -1,0 +1,21 @@
+{
+  "name": "sibilant-mithril-seview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "./compile.sh && browserify target/index.js -o build/generated-app.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "mithril": "^1.1.6",
+    "mithril-stream": "^1.1.0",
+    "patchinko": "^3.2.1",
+    "seview": "^0.10.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2",
+    "sibilant": "^0.5.5"
+  }
+}

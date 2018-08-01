@@ -375,7 +375,7 @@ m("button", {
         () => 'Create'
         ,() => 'Save'
     )
-))
+)))
 
 ```
 Above we do care if the state is valid or modified when determining if the button is disabled.
@@ -436,7 +436,7 @@ someFunction({ name: 'hello', dob: new Date() }) // type error, "name" is not a 
 "You can also use sanctuary-def types in a sum-type."
 
 const Auth = Sum('Auth', {
-  LoggedIn: { username: $.String, session_id: $.FiniteNumber } //<-- built in sanctuary-def types
+  LoggedIn: { username: $.String, session_id: $.FiniteNumber }, //<-- built in sanctuary-def types
   LoggedOut: {}
 })
 

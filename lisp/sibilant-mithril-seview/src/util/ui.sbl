@@ -1,0 +1,12 @@
+(var m (require "mithril"))
+(var { sv } (require "seview"))
+
+(set exports 'h (sv (#(node)
+  (ternary (string? node)
+    { tag "#" children node }
+    (ternary (and node.attrs node.attrs.innerHTML)
+      (m node.tag (m.trust node.attrs.innerHTML))
+      (m node.tag (or node.attrs {}) (or node.children []))
+    )
+  )
+)))

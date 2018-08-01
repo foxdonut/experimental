@@ -1,0 +1,11 @@
+(def create-view ()
+  (#(model)
+    ["form"
+      ["fieldset"
+        ["button" "Save"]]
+      ["span" "Saved:"]]
+  ))
+
+(set module 'exports {
+  create-view create-view
+})

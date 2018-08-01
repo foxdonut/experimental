@@ -1,0 +1,9 @@
+(var { create-view } (require "./view"))
+
+(def create-app (update) {
+  view (create-view)
+})
+
+(set module 'exports {
+  create-app create-app
+})

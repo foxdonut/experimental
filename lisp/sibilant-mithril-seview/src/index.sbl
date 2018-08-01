@@ -1,0 +1,13 @@
+(var m (require "mithril"))
+(var stream (require "mithril/stream"))
+(var O (require "patchinko/overloaded"))
+
+(var { create-app } (require "./app"))
+(var { h } (require "./util/ui"))
+
+(var update (stream))
+(var app (create-app update))
+;(var models (stream.scan O (app.model) update))
+(var models (stream.scan O {} update))
+(var element (document.getElementById "app"))
+(models.map (#(model) (m.render element (h (app.view model)))))

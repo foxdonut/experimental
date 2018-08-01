@@ -1,0 +1,12 @@
+(var crocks (require "crocks"))
+
+(set module 'exports {
+  assoc crocks.assoc
+  compose crocks.compose
+  merge crocks.merge
+  path (crocks.propPathOr null)
+  pipe crocks.pipe
+  prop (crocks.propOr null)
+  thrush crocks.applyTo
+  when crocks.when
+})
