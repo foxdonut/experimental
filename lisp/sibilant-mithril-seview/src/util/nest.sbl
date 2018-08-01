@@ -2,11 +2,11 @@
 (var fp (require "./fp"))
 
 (def nest-patch (object path)
-  (var result {})
-  (set result (get path 0)
+  (fp.assoc (get path 0)
     (ternary (= path.length 1)
       (O object)
-      (O (nest-patch object (path.slice 1))))))
+      (O (nest-patch object (path.slice 1))))
+    {}))
 
 (def nest-update (update path)
   (#(patch) (update (nest-patch patch path))))

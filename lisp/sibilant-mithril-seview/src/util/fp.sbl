@@ -3,11 +3,14 @@
 (set module 'exports {
   assign (crocks.flip crocks.assign)
   assoc crocks.assoc
+  B crocks.compose
   compose crocks.compose
   has-prop crocks.hasProp
+  K crocks.constant
   path (crocks.propPathOr null)
   pipe crocks.pipe
   prop (crocks.propOr null)
+  T crocks.applyTo
   thrush crocks.applyTo
   when crocks.when
 })

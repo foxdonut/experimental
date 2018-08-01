@@ -8,10 +8,10 @@
 
 (def create-actions (update) {
   increase (#(amount) (update { value (O (#(value) (+ value amount))) }))
-  change-units (update (#(model)
+  change-units (#() (update (#(model)
     (var new-units (ternary (= model.units "C") "F" "C"))
     (var new-value (convert model.value new-units))
-    (O model { units new-units value new-value })))
+    (O model { units new-units value new-value }))))
 })
 
 (set module 'exports {

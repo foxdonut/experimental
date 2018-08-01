@@ -1,11 +1,10 @@
 (def create-view (components)
   (#(model)
-    (console.log "MODEL:" model)
-    ["form"
+    ["form.pure-form.pure-form-aligned"
       ["fieldset"
         (components.air-temp.view model)
         (components.water-temp.view model)
-        ["button" "Save"]]
+        ["button.pure-button.pure-button-primary" "Save"]]
       ["span" "Saved:"]]
   ))
 

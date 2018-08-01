@@ -1,15 +1,22 @@
+(var fp (require "../util/fp"))
+(var { prevent-default } (require "../util/ui"))
+
 (var marginRight { marginRight "4px" })
 
 (def create-view (actions)
   (#(model)
-    (console.log "model:" model)
-    ["div"
+    ["div.pure-control-group"
       ["label" model.label]
       ["span" { style marginRight } model.value]
-      ["button" { onClick actions.change-units style marginRight }
+      ["button.pure-button"
+        { onClick (fp.B actions.change-units prevent-default) style marginRight }
         (concat "\xB0" model.units)]
-      ["button" { onClick (actions.increase  1) style marginRight } "+"]
-      ["button" { onClick (actions.increase -1) style marginRight } "-"]]
+      ["button.pure-button"
+        { onClick (fp.B actions.increase (fp.K  1) prevent-default) style marginRight }
+        "+"]
+      ["button.pure-button"
+        { onClick (fp.B actions.increase (fp.K -1) prevent-default) style marginRight }
+        "-"]]
   ))
 
 (set module 'exports {

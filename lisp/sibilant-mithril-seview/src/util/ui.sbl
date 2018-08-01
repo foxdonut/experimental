@@ -1,12 +1,24 @@
 (var m (require "mithril"))
 (var { sv } (require "seview"))
 
-(set exports 'h (sv (#(node)
-  (ternary (string? node)
-    { tag "#" children node }
-    (ternary (and node.attrs node.attrs.innerHTML)
-      (m node.tag (m.trust node.attrs.innerHTML))
-      (m node.tag (or node.attrs {}) (or node.children []))
-    )
-  )
-)))
+(def process-attrs (attrs)
+  (each-key key attrs
+    (if (key.startsWith "on")
+      (do
+        (var value (get attrs key))
+        (delete (get attrs key))
+        (set attrs (key.toLowerCase) value)
+      )))
+  attrs)
+
+(set exports 'h
+  (sv (#(node)
+    (ternary (string? node)
+      { tag "#" children node }
+      (ternary (and node.attrs node.attrs.innerHTML)
+        (m node.tag (m.trust node.attrs.innerHTML))
+        (m node.tag (process-attrs (or node.attrs {})) (or node.children []))
+      )))))
+
+(set exports 'prevent-default
+  (#(evt) (evt.preventDefault) evt))
