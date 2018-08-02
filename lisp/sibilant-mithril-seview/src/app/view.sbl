@@ -1,10 +1,13 @@
+(var { prevent-default } (require "../util/ui"))
+
 (def create-view (components)
   (#(model)
     ["form.pure-form.pure-form-aligned"
       ["fieldset"
         (components.air-temp.view model)
         (components.water-temp.view model)
-        ["button.pure-button.pure-button-primary" "Save"]]
+        ["button.pure-button.pure-button-primary"
+          { onClick prevent-default } "Save"]]
       ["span" "Saved:"]]
   ))
 

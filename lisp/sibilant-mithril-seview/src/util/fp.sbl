@@ -1,11 +1,16 @@
 (var crocks (require "crocks"))
 
 (set module 'exports {
+  A (#(f) (#(x) (f x)))
   assign (crocks.flip crocks.assign)
   assoc crocks.assoc
   B crocks.compose
+  C crocks.flip
   compose crocks.compose
+  flip crocks.flip
   has-prop crocks.hasProp
+  I crocks.identity
+  identity crocks.identity
   K crocks.constant
   path (crocks.propPathOr null)
   pipe crocks.pipe
