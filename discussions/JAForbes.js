@@ -924,38 +924,56 @@ module.exports = {
 The top 3 functions would be provided utils, the last 3 is usage code
 so queries are like lenses that assume you want to update, and because we're assuming that we avoid
 a lot of indirection by having to use functors ( R.over ). Instead we just call the query directly.
+
+combinators:
+https://gist.github.com/Avaq/1f0636ec5c8d6aed2e45k
+
 */
 
-const o = f => g => x => f(g(x))
-const $prop = k => f => o =>
-  Object.assign({}, o, { [k]: f(o[k]) })
+const B = f => g => x => f(g(x))
+const $prop = k => f => obj =>
+  Object.assign({}, obj, { [k]: f(obj[k]) })
 
 const $stream = f => s => {
-  s( f(s() ))
+  s( f( s() ) )
   return s
 }
-const $abc = o ( $stream ) ( $prop ('abc') )
-const $xyz = o ( $abc ) ( $prop ('xyz') )
 
-
-$xyz ( x => x + 1 ) (s)
-
-// So, to get the nested value from your stream, we'd use.
-
-$xyz(view) (s)
-
-// and that will return whatever s().abc.xyz's value is
 // view is a visitor function that instead of transforming the value, it just returns it
+// it basically cheats the system, instead of transforming x, it stores it, and then returns it
 // it's literally this:
 
-const view = f => o => {
+const view = f => obj => {
   var result;
-  f( ( x ) => {
+  f(  x  => {
     result = x
     return x
-  } ) (o)
+  } ) (obj)
   return result
 }
 
-// it basically cheats the system, instead of transforming x, it stores it, and then returns it
+
+const source = {
+  abc: {
+    xyz: 42
+  }
+}
+const s1 = m.stream(source)
+
+const $abc = B ( $stream ) ( $prop ('abc') )
+const $xyz = B ( $abc ) ( $prop ('xyz') )
+
+$xyz ( x => x + 1 ) (s1)
+console.log("s1:", s1())
+
+// So, to get the nested value from your stream, we'd use view($xyz).
+// and that will return whatever s().abc.xyz's value is.
+
+console.log("view $xyz:", view($xyz) (s1))
+
+console.log("s1:", s1())
+console.log("source:", source)
+
+console.log("prop abc:", $prop('abc')(x => x * 10)({ abc: 10 }))
+console.log("view prop abc:", view($prop('abc'))({ abc: "duck" }))
 
