@@ -930,6 +930,11 @@ https://gist.github.com/Avaq/1f0636ec5c8d6aed2e45k
 
 */
 
+// Credit: James Forbes (http://james-forbes.com)
+// Queries
+
+// This is utility code
+
 const B = f => g => x => f(g(x))
 const $prop = k => f => obj =>
   Object.assign({}, obj, { [k]: f(obj[k]) })
@@ -952,6 +957,8 @@ const view = f => obj => {
   return result
 }
 
+
+// This is application code
 
 const source = {
   abc: {
