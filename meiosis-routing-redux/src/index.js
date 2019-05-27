@@ -12,6 +12,7 @@ import { router } from './router';
 
 const preloadedState = { route: { current: [Route.Home()] } };
 
+const compose = (f, g) => x => f(g(x));
 const update = createAction("UPDATE");
 const combine = patches => model => merge(model, ...patches);
 
@@ -40,4 +41,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-router.start({ navigateTo: actions.navigateTo });
+router.start({ navigateTo: compose(store.dispatch, actions.navigateTo) });
