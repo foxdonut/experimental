@@ -6,7 +6,5 @@ export const service = ({ state, update }) => {
     setTimeout(() => {
       update({ teas });
     }, 500);
-  } else if (findRouteSegment(state.route.leave, "Tea")) {
-    update({ teas: null });
   }
 };

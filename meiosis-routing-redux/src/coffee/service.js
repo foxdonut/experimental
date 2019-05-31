@@ -4,8 +4,6 @@ import { coffees } from "../beverage/data";
 
 export const service = ({ state, update }) => {
   if (findRouteSegment(state.route.arrive, "Coffee")) {
-    update({ pleaseWait: true });
-
     setTimeout(
       () =>
         update({
@@ -14,7 +12,5 @@ export const service = ({ state, update }) => {
         }),
       1000
     );
-  } else if (findRouteSegment(state.route.leave, "Coffee")) {
-    update({ coffees: null });
   }
 };

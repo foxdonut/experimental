@@ -4,35 +4,31 @@ import { configureStore, createAction } from 'redux-starter-kit'
 import { Provider } from 'react-redux';
 import merge from 'mergerino';
 
-import { createApp } from './App';
-import { login } from './login';
-import { settings } from './settings';
-import { Route, routes } from './routes';
+import { createApp, connectApp } from './app';
 import { router } from './router';
-
-const preloadedState = { route: { current: [Route.Home()] } };
 
 const compose = (f, g) => x => f(g(x));
 const update = createAction("UPDATE");
 const combine = patches => model => merge(model, ...patches);
 
-const actions =
-  Object.assign(
-    {},
-    routes.Actions({ update, combine }),
-    login.Actions({ update, combine }),
-    settings.Actions({ update, combine })
-  );
+const app = createApp(router.initialRoute);
+const preloadedState = app.Initial();
+const actions = app.Actions(update);
 
-const App = createApp(actions);
+const singlePatch = patch => (Array.isArray(patch) ? combine(patch) : patch);
 
-const reducer = (state, action) => merge(state, action.payload);
+const accept =
+  model => app.acceptors.reduce((mdl, acceptor) => merge(mdl, singlePatch(acceptor(mdl))), model);
+
+const reducer = (state, action) => accept(merge(state, singlePatch(action.payload)));
 
 const store = configureStore({
   preloadedState,
   reducer,
   devTools: process.env.NODE_ENV !== 'production'
 });
+
+const App = connectApp(actions);
 
 ReactDOM.render(
   <Provider store={store}>
@@ -42,3 +38,16 @@ ReactDOM.render(
 );
 
 router.start({ navigateTo: compose(store.dispatch, actions.navigateTo) });
+
+const dispatchUpdate = compose(store.dispatch, update);
+
+const runServices = () => {
+  app.services.forEach(service => service({
+    state: store.getState(),
+    update: dispatchUpdate
+  }));
+};
+
+store.subscribe(runServices);
+
+runServices();

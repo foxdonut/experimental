@@ -1,11 +1,10 @@
-import { accept } from "./accept";
+import { preAccept, postAccept } from "./accept";
 import { Actions } from "./actions";
-import { service } from "./service";
 
 export const login = {
-  accept,
-  Actions,
-  service
+  preAccept,
+  postAccept,
+  Actions
 };
 
 export { Login } from "./view";

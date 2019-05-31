@@ -21,7 +21,7 @@ const componentMap = {
   NotFound: () => <div>Page Not Found</div>
 };
 
-export const Root = ({ state, actions }) => {
+export const Root = ({ state, ...actions }) => {
   const routing = Routing(state.route.current);
   const Component = componentMap[routing.localSegment.id];
   const isActive = tab => (tab === Component ? "active" : "");
