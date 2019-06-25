@@ -1,9 +1,0 @@
-export const render = query => (
-<html>
-    <head><title>Hello {query.name}</title></head>
-    <body>
-        Hello {query.name}
-    </body>
-</html>
-);
-
