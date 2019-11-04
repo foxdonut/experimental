@@ -31,7 +31,9 @@ import {
 import blue from '@material-ui/core/colors/blue';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 
-import { initialAppContextItems } from './app.machine';
+import { initial } from './initial';
+import { Actions } from './actions';
+import { services } from './services';
 
 import simpleStream from 'meiosis-setup/simple-stream';
 import merge from 'mergerino';
@@ -75,15 +77,6 @@ const styles = (theme) => createStyles({
       zIndex: 1,
     }
 });
-
-// Simulated API request
-let attempts = 2
-function deleteItems(items) {
-    return new Promise((resolve, reject) => (++attempts % 3 === 0)
-        ? setTimeout(() => resolve(`${items.length} items deleted succesfully`), 1000)
-        : setTimeout(() => reject(`Error deleting the ${items.length} selected item(s). Please try again later.`), 1000)
-    )
-};
 
 const Root = props => {
     const { state, actions } = props;
@@ -227,78 +220,9 @@ const App = meiosisReact({ React, Root });
 
 export default withStyles(styles)((props) => {
   const app = {
-    initial: Object.assign({
-      items: initialAppContextItems,
-      viewState: 'browsing',
-    }, props),
-    Actions: update => ({
-      toggleSelectItem: item => {
-        if (item.selected) {
-          update({
-            items: items => items.map(it => {
-              if (it.id === item.id) {
-                it.selected = false
-              }
-              return it
-            })
-          })
-        } else {
-          update({
-            items: items => items.map(it => {
-              if (it.id === item.id) {
-                it.selected = true
-              }
-              return it
-            })
-          })
-        }
-      },
-      resetSelection: () => update({
-        items: items => items.map(it => {
-          it.selected = false
-          return it
-        })
-      }),
-      selectAll: () => update({
-        items: items => items.map(it => {
-          it.selected = true
-          return it
-        })
-      }),
-      deleteSelection: () => update({
-        viewState: 'deleting'
-      }),
-      dismissPrompt: () => update({
-        viewState: 'selecting'
-      })
-    }),
-    services: [
-      ({ state }) => ({
-        state: { selectedItems: state.items.filter(it => it.selected) }
-      }),
-      ({ state, patch }) => !patch.viewState && ({
-        state: { viewState: state.selectedItems.length === 0 ? 'browsing' : 'selecting' }
-      }),
-      ({ state, patch }) => {
-        if (patch.viewState === 'deleting') {
-          return {
-            next: ({ state, update }) => {
-              const items = state.items.filter(it => it.selected)
-              deleteItems(items).then(() => {
-                update({
-                  items: items => items.filter(it => !it.selected)
-                })
-              }).catch(message => {
-                update({
-                  viewState: 'prompting',
-                  message
-                })
-              })
-            }
-          }
-        }
-      }
-    ]
+    initial: Object.assign(initial, props),
+    Actions,
+    services
   };
 
   const { states, actions } = meiosisMergerino({

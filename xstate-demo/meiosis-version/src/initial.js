@@ -1,4 +1,5 @@
-export const initialAppContextItems = [
+export const initial = {
+  items: [
     {
         id: 0,
         title: 'Summer Photos',
@@ -35,4 +36,6 @@ export const initialAppContextItems = [
         owner: 'Janet Perkins',
         updatedAt: new Date(Date.UTC(2017,4,7))
     }
-]
+  ],
+  viewState: 'browsing'
+}
