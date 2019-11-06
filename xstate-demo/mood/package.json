@@ -5,11 +5,10 @@
   "dependencies": {
     "@material-ui/core": "3.9.3",
     "@material-ui/icons": "3.0.2",
-    "@xstate/react": "0.2.0",
+    "mood": "^1.0.0",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-scripts": "2.1.8",
-    "xstate": "4.4.0"
+    "react-scripts": "2.1.8"
   },
   "scripts": {
     "start": "react-scripts start",
