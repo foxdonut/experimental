@@ -1,36 +1,24 @@
+const setAllItemsTo = value => items => items.map(it => {
+  it.selected = value
+  return it
+})
+
 export const Actions = update => ({
   toggleSelectItem: item => {
-    if (item.selected) {
-      update({
-        items: items => items.map(it => {
-          if (it.id === item.id) {
-            it.selected = false
-          }
-          return it
-        })
+    update({
+      items: items => items.map(it => {
+        if (it.id === item.id) {
+          it.selected = !item.selected
+        }
+        return it
       })
-    } else {
-      update({
-        items: items => items.map(it => {
-          if (it.id === item.id) {
-            it.selected = true
-          }
-          return it
-        })
-      })
-    }
+    })
   },
   resetSelection: () => update({
-    items: items => items.map(it => {
-      it.selected = false
-      return it
-    })
+    items: setAllItemsTo(false)
   }),
   selectAll: () => update({
-    items: items => items.map(it => {
-      it.selected = true
-      return it
-    })
+    items: setAllItemsTo(true)
   }),
   deleteSelection: () => update({
     viewState: 'deleting'
