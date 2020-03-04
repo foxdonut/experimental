@@ -3,24 +3,43 @@
 import { jsx, Box, Card, Grid, Flex, Button } from "theme-ui"
 import { Rewind, FastForward, Play, Square, Pause } from "react-feather"
 import { motion, transform } from "framer-motion"
-import { run, tags } from "stags"
+import { either, run } from "stags"
 import merge from "mergerino"
 import meiosisMergerino from "meiosis-setup/mergerino"
 import simpleStream from "meiosis-setup/simple-stream"
 import React from "react"
 
-const I = x => x
 const K = x => () => x
 
 const MAX_TIME = 30
 
-const PlayerState = tags("PlayerState", [
-  "Stopped",
-  "Playing",
-  "Paused",
-  "Rewinding",
-  "FastForwarding"
-])
+const Moving = either("Moving")
+const Forward = either("Forward")
+const Accelerating = either("Accelerating")
+const Scrubbing = either("Scrubbing")
+const Paused = either("Paused")
+
+const getLabel = Moving.bifold(
+  Paused.bifold(K("Stopped"), K("Paused")),
+  Forward.bifold(
+    Scrubbing.bifold(K("Rewinding"), K("Scrubbing Back")),
+    Accelerating.bifold(
+      K("Playing"),
+      Scrubbing.bifold(K("Fast Forwarding"), K("Scrubbing Forward"))
+    )
+  )
+)
+
+const computeDelay = Moving.bifold(
+  K(0),
+  Forward.bifold(
+    Scrubbing.bifold(K(-100), K(-75)),
+    Accelerating.bifold(
+      K(1000),
+      Scrubbing.bifold(K(100), K(75))
+    )
+  )
+)
 
 // This "accepts" a patch to update the current time.
 // While playing, the effect triggers a currentTime update after a delay.
@@ -28,47 +47,33 @@ const PlayerState = tags("PlayerState", [
 // Then the currentTime update arrives, but we are Stopped or Paused.
 // In that case, we should not accept the currentTime update, and instead revert to the previous.
 const acceptService = ({ state, previousState, patch }) => {
-  if (patch && patch.currentTime &&
-       (PlayerState.isStopped(state.playerState) ||
-        PlayerState.isPaused(state.playerState)))
-  {
+  if (patch && patch.currentTime && (Moving.isN(state.playerState))) {
     return { currentTime: previousState.currentTime }
   }
 }
 
-const withinRange = t => PlayerState.fold({
-  Stopped: K(false),
-  Playing: () => t < MAX_TIME,
-  Paused: K(false),
-  Rewinding: () => t > 0,
-  FastForwarding: () => t < MAX_TIME
-})
+const withinRange = t => Moving.bifold(
+  K(false),
+  Forward.bifold(
+    () => t > 0,
+    () => t < MAX_TIME
+  )
+)
 
 const validateRange = state => () => withinRange(state.currentTime)(state.playerState)
   ? null
-  : { playerState: PlayerState.Stopped() }
+  : { playerState: Moving.N(Paused.N()) }
 
 // This determines whether the next state should be Stopped, which is if we are "moving"
-// (Playing, Rewinding, FastForwarding), and have reached the end (or beginning) of the tape.
+// (Playing, Rewinding, Fast Forwarding, etc.), and have reached the end (or beginning) of the tape.
 const stateService = ({ state }) =>
   run(
     state.playerState,
-    PlayerState.fold({
-      Stopped: K(null),
-      Playing: validateRange(state),
-      Paused: K(null),
-      Rewinding: validateRange(state),
-      FastForwarding: validateRange(state)
-    })
+    Moving.bifold(
+      K(null),
+      validateRange(state)
+    )
   )
-
-const computeDelay = PlayerState.fold({
-  Stopped: K(0),
-  Playing: K(1000),
-  Paused: K(0),
-  Rewinding: ({ delay }) => -delay,
-  FastForwarding: ({ delay }) => delay
-})
 
 const effect = ({ state, update }) => {
   const within = withinRange(state.currentTime)(state.playerState)
@@ -85,60 +90,46 @@ const effect = ({ state, update }) => {
 }
 
 const Actions = update => ({
-  stop: () => update({ playerState: PlayerState.Stopped() }),
-  play: () => update({ playerState: PlayerState.Playing() }),
-  pause: () => update({ playerState: PlayerState.Paused() }),
-  rewind: () => update({ playerState: PlayerState.Rewinding({ delay: 100, scrubbing: false }) }),
-  fastForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 100, scrubbing: false }) }),
-  scrubBack: () => update({ playerState: PlayerState.Rewinding({ delay: 50, scrubbing: true }) }),
-  scrubForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 50, scrubbing: true }) })
+  stop: () => update({ playerState: Moving.N(Paused.N()) }),
+  play: () => update({ playerState: Moving.Y(Forward.Y(Accelerating.N())) }),
+  pause: () => update({ playerState: Moving.N(Paused.Y()) }),
+  rewind: () => update({ playerState: Moving.Y(Forward.N(Scrubbing.N())) }),
+  scrubBack: () => update({ playerState: Moving.Y(Forward.N(Scrubbing.Y())) }),
+  fastForward: () => update({ playerState: Moving.Y(Forward.Y(Accelerating.Y(Scrubbing.N()))) }),
+  scrubForward: () => update({ playerState: Moving.Y(Forward.Y(Accelerating.Y(Scrubbing.Y()))) })
 })
 
-const computeEnabled = state =>
-  run(
-    state.playerState,
-    PlayerState.fold({
-      Stopped: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: false,
-        pause: false
-      }),
-      Playing: () => ({
-        play: false,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: true,
-        pause: true
-      }),
-      Paused: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: false,
-        pause: false
-      }),
-      Rewinding: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: true, // FIXME
-        fastForward: state.currentTime < MAX_TIME,
-        stop: true,
-        pause: false
-      }),
-      FastForwarding: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: false,
-        stop: true,
-        pause: false
-      })
-    })
-  )
+const computeEnabled = state => ({
+  play: state.currentTime < MAX_TIME && run(state.playerState,
+    Moving.bifold(
+      K(true),
+      Forward.bifold(
+        K(true),
+        Accelerating.bifold(K(false), K(true))))),
+
+  rewind: state.currentTime > 0 && run(state.playerState,
+    Moving.bifold(
+      K(true),
+      Forward.bifold(
+        Scrubbing.bifold(K(false), K(true)),
+        K(true)))),
+
+  fastForward:  state.currentTime < MAX_TIME && run(state.playerState,
+    Moving.bifold(
+      K(true),
+      Forward.bifold(
+        K(true),
+        Accelerating.bifold(
+          K(true),
+          Scrubbing.bifold(K(false), K(true)))))),
+
+  stop: run(state.playerState, Moving.bifold(K(false), K(true))),
+  pause: run(state.playerState, Moving.bifold(K(false), K(true)))
+})
 
 const initial = {
   currentTime: 0,
-  playerState: PlayerState.Stopped()
+  playerState: Moving.N(Paused.N())
 }
 
 const app = {
@@ -150,6 +141,24 @@ const app = {
 
 const { states, actions } =
   meiosisMergerino({ stream: simpleStream, merge, app })
+
+const rewindEvents = {
+  onClick: () => actions.rewind()
+}
+
+const scrubBackEvents = {
+  onMouseDown: () => actions.scrubBack(),
+  onMouseUp: () => actions.pause()
+}
+
+const fastForwardEvents = {
+  onClick: () => actions.fastForward()
+}
+
+const scrubForwardEvents = {
+  onMouseDown: () => actions.scrubForward(),
+  onMouseUp: () => actions.pause()
+}
 
 function EventButton({ enabled, type, events, children }) {
   const isDisabled = !enabled[type]
@@ -213,21 +222,27 @@ export default class extends React.Component {
     const speed = Math.abs(computeDelay(state.playerState) / 1000)
     const enabled = computeEnabled(state)
 
-    const rewindEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubBack() }
-      : PlayerState.isRewinding(state.playerState) // FIXME
-      ? { onMouseUp: () => actions.pause() }
-      : { onClick: () => actions.rewind() }
+    const rewindButtonEvents = run(state.playerState,
+      Moving.bifold(
+        Paused.bifold(K(rewindEvents), K(scrubBackEvents)),
+        Forward.bifold(
+          Scrubbing.bifold(K(rewindEvents), K(scrubBackEvents)),
+          K(rewindEvents))))
 
-    const fastForwardEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubForward() }
-      : { onClick: () => actions.fastForward() }
+    const fastForwardButtonEvents = run(state.playerState,
+      Moving.bifold(
+        Paused.bifold(K(fastForwardEvents), K(scrubForwardEvents)),
+        Forward.bifold(
+          K(fastForwardEvents),
+          Accelerating.bifold(
+            K(fastForwardEvents),
+            Scrubbing.bifold(K(fastForwardEvents), K(scrubForwardEvents))))))
 
     return (
       <Card>
         <div style={{display: "flex", justifyContent: "space-between", fontSize: "24px"}}>
           <span>{state.currentTime}</span>
-          <span>{state.playerState.case}</span>
+          <span>{getLabel(state.playerState)}</span>
         </div>
         <Flex mb={3} bg="shade" sx={{ justifyContent: "center", borderRadius: 3 }}>
           <Wheel progress={progress} speed={speed} />
@@ -238,10 +253,10 @@ export default class extends React.Component {
             events={{ onClick: () => actions.play() }}>
             <Play />
           </EventButton>
-          <EventButton enabled={enabled} type="rewind" events={rewindEvents}>
+          <EventButton enabled={enabled} type="rewind" events={rewindButtonEvents}>
             <Rewind />
           </EventButton>
-          <EventButton enabled={enabled} type="fastForward" events={fastForwardEvents}>
+          <EventButton enabled={enabled} type="fastForward" events={fastForwardButtonEvents}>
             <FastForward />
           </EventButton>
           <EventButton enabled={enabled} type="stop"
