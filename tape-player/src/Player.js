@@ -14,24 +14,19 @@ const K = x => () => x
 
 const MAX_TIME = 30
 
-const PlayerState = tags("PlayerState", [ "Stopped", "Playing", "Paused", "Rewinding", "FastForwarding" ])
+const PlayerState = tags("PlayerState", [
+  "Stopped",
+  "Playing",
+  "Paused",
+  "Rewinding",
+  "FastForwarding"
+])
 
-const withinRange = t => PlayerState.fold({
-  Stopped: K(false),
-  Playing: () => t < MAX_TIME,
-  Paused: K(false),
-  Rewinding: () => t > 0,
-  FastForwarding: () => t < MAX_TIME
-})
-
-const computeDelay = PlayerState.fold({
-  Stopped: K(0), Playing: K(1000), Paused: K(0), Rewinding: I, FastForwarding: I
-})
-
-const validateRange = state => () => withinRange(state.currentTime)(state.playerState)
-  ? null
-  : { playerState: PlayerState.Stopped() }
-
+// This "accepts" a patch to update the current time.
+// While playing, the effect triggers a currentTime update after a delay.
+// After the trigger but before the delay elapses, we could press Stop or Pause.
+// Then the currentTime update arrives, but we are Stopped or Paused.
+// In that case, we should not accept the currentTime update, and instead revert to the previous.
 const acceptService = ({ state, previousState, patch }) => {
   if (patch && patch.currentTime &&
        (PlayerState.isStopped(state.playerState) ||
@@ -41,6 +36,20 @@ const acceptService = ({ state, previousState, patch }) => {
   }
 }
 
+const withinRange = t => PlayerState.fold({
+  Stopped: K(false),
+  Playing: () => t < MAX_TIME,
+  Paused: K(false),
+  Rewinding: () => t > 0,
+  FastForwarding: () => t < MAX_TIME
+})
+
+const validateRange = state => () => withinRange(state.currentTime)(state.playerState)
+  ? null
+  : { playerState: PlayerState.Stopped() }
+
+// This determines whether the next state should be Stopped, which is if we are "moving"
+// (Playing, Rewinding, FastForwarding), and have reached the end (or beginning) of the tape.
 const stateService = ({ state }) =>
   run(
     state.playerState,
@@ -52,6 +61,14 @@ const stateService = ({ state }) =>
       FastForwarding: validateRange(state)
     })
   )
+
+const computeDelay = PlayerState.fold({
+  Stopped: K(0),
+  Playing: K(1000),
+  Paused: K(0),
+  Rewinding: x => -x,
+  FastForwarding: I
+})
 
 const effect = ({ state, update }) => {
   const within = withinRange(state.currentTime)(state.playerState)
@@ -71,9 +88,9 @@ const Actions = update => ({
   stop: () => update({ playerState: PlayerState.Stopped() }),
   play: () => update({ playerState: PlayerState.Playing() }),
   pause: () => update({ playerState: PlayerState.Paused() }),
-  rewind: () => update({ playerState: PlayerState.Rewinding(-50) }),
+  rewind: () => update({ playerState: PlayerState.Rewinding(50) }),
   fastForward: () => update({ playerState: PlayerState.FastForwarding(50) }),
-  scrubBack: () => update({ playerState: PlayerState.Rewinding(-100) }),
+  scrubBack: () => update({ playerState: PlayerState.Rewinding(100) }),
   scrubForward: () => update({ playerState: PlayerState.FastForwarding(100) })
 })
 
