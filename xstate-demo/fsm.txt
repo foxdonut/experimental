@@ -1,0 +1,405 @@
+Re: FSM's, I think sum-type's cover that need and then are a more generally
+useful tool.
+
+E.g. I model FSM's with sum type's using a nested chain/flatMap where allowed
+cases return Just and disallowed return Nothing. I think it's important to not
+reinvent common primatives, I look at an FSM and I see custom control flow that
+is just flatMap or chain, or alt, or bimap. And it's so much more of a struggle
+if you can't recongnize those existing patterns and use them.
+
+I think that's where a lot of the compression comes from that FSM requires,
+just knowing those common patterns and not handwriting them.
+
+James Forbes @JAForbes 08:36 2019-11-07
+@davidkpiano
+
+@JAForbes That would make a great article! Would love to read about this more in depth.
+
+Thanks. I've been really bad with article writing lately, life has gotten in
+the way. I've got a new (awesome) job now and I've noticed my creative juices
+returning largely as a result of that. So hopefully!
+
+I skimmed through it, and (this might be tangential) basically I find it
+"safer" to develop in terms of "the next value is the current value as a result
+of this signal" rather than "the next value is this... let me know if this is
+valid"
+
+Yeah for me it depends completely on the scenario, but I agree, that's the most
+common case.
+
+@foxdonut
+
+@JAForbes @davidkpiano I'm also wondering about this.
+
+Yeah so this is valid too. We have a union type of states for the light and a
+union type of "events" and we fold over both unions to get a new light state.
+
+That's how Elm works too, we've got an Action union type and we fold over that
+to update that state.
+
+const Action = S.tags('Action', ['Timer', 'Ambulance'])
+const action$ = m.stream()
+
+Light.next = 
+  Light.fold({
+    Green: Light.Yellow,
+    Yellow: Light.Red,
+    Red: Light.Yellow
+  })
+
+// state machine
+const state = m.stream.scan(
+    (light, action) => S.run(
+        action,
+        Action.fold({
+
+            // Normal timer process.
+            Timer: () => Light.next(light),
+
+            // Ambulance can trigger Green -> Red manually
+            Ambulance: () => S.run(
+                light,
+                Light.fold({
+                    Red: Light.Red,
+                    Green: Light.Yellow,
+                    Yellow: Light.Yellow
+                })
+            )
+        })
+    )
+    , Light.Red()
+    , action$
+)
+
+// somewhere
+setInterval(
+    () => action$( Action.Timer() )
+    , 5000
+)
+
+// somewhere else
+const ambulance = () =>
+    action$( Action.Ambulance() )
+
+So above we change how we transition Lights depending on the current state of
+the light and the action that was passed in to the state machine. If we let the
+timer do it's thing, it simply cycles: Green -> Yellow -> Red -> Green .... If
+there's an Ambulance we transition towards Red by switching the state to Yellow
+unless if it is already Red.
+
+This isn't so bad when there's not that many states, but we can see some
+duplication:
+
+Light.fold({
+    Red: Light.Red,
+    Green: Light.Yellow,
+    Yellow: Light.Yellow
+})
+
+So that example is for clarity, but I feel like I should cover how this
+approach compresses. In this case, it's fine but let's imagine there's 15
+cases, and 2 possibilities. There's two strategies I use to compress that
+possibility space.
+
+One is to use an Either or Maybe to model the funnel from n possibilities to 2
+possibilities.
+
+pipe(
+    Light.fold({
+        Red: Y,
+        Green: N,
+        Yellow: N
+    })
+    ,bifold(
+        Light.Yellow
+        Light.Red
+    )
+)
+This is what I referring the other day when I mentioned:
+
+I model FSM's with sum type's using a nested chain/flatMap where allowed cases
+return Just and disallowed return Nothing.
+
+Another approach I use when there are common relationships between separate
+cases of the sum type is to create a partial fold. stags has a helper to
+generate partial folds called otherwise.
+
+const canDrive = S.otherwise(['Green', 'Yellow'])
+
+canDrive(Light.Yellow)
+
+// produces an object with the provided visitor duplicated
+{ Green: Light.Yellow
+, Yellow: Light.Yellow
+}
+
+If you pass that into fold you'll get an error because the union was not fully
+satisfied, and our unions are discriminated.
+
+Light.fold(
+    canDrive( Light.Yellow )
+) // TypeError: ...
+
+(!) TypeError! Light has cases Red | Green | Yellow, but only Green and Yellow
+were provided. Please review the definition of the Light type, to either
+exclude Red or update this fold to include Red.
+
+The aim is to make the error messages very Elm like. And this is where
+discriminated unions really shine, it allows intent to be clearly communicated
+and represented, if there's 3 states, we have to handle all of them. If we miss
+something, the "compiler" can tell us what mistake we made.
+
+Another difference from all other sum type libs I've seen is, stags is manually
+curried, this error will occur before you pass the final argument in to the
+fold. So if all your function definitions are defined at the top level of the
+module, you can get a very compile-time like experience because common errors
+will occur before any actual data starts flowing through your compositions.
+
+... I digress ...
+
+So then we bring in the divergent cases either via another partial fold, or by
+specifically mentioning the cases.
+
+Light.fold({
+    ...canDrive( Light.Yellow )
+    , Red: Light.Red
+
+})
+
+// Ok
+
+Why I like this partial fold strategy so much (instead of placeholder
+argument's), is you get super helpful type errors when you change the
+definition of your type. E.g. if I renamed by Light.Yellow to Light.Amber, or
+if I remove Yellow altogether and just have 2 lights, or I have 4 lights (like
+some countries do). All the folds that uses canDrive will give me a type
+error because the definition of the partial fold differs from the discriminated
+union.
+
+But with placeholder's, it just accepts anything that you didn't mention which
+is not resilient to changing data structures, which makes placeholder's
+brittle.
+
+That issue alone is a major reason I paused development on sum-type, and
+started working on stags.
+
+@foxdonut
+
+@JAForbes I always end up at routing for a use case.. if we stop thinking in
+terms of events and transitions, how do we model the code that takes care of
+loading data upon arriving at a route, cleaning up when leaving a route,
+guarding a route to require that the user be logged in, redirecting,
+etc.?
+
+I think a lot of the time, these things require FSM's, or transitions, but at a
+global level - isolated from most logic in the app. These FSM's consume
+relational data to dictate what transitions need to happen and when.
+
+That's sort of what I was aiming to solve with meiosis services. Isolated
+parellel intelligent state machines that handle all these messy data
+synchronization problems.
+
+If we look back at that Light + Action state machine, it's almost a meiosis
+service, let's make it one!
+
+const init = () => ({ light: Light.Red() })
+
+const setState = m.stream()
+
+const getState$ = 
+    m.stream.scan( (p,f) => f(p), init(), setState$)
+
+const LightService = (getState$, action$) => {
+    const out$ = m.stream()
+
+    const light$ = dropRepeats( getState.map( x => x.light ))
+
+    m.stream.merge([light$, action$]).map(
+        ([light, action]) => S.run(
+            action,
+            Action.fold({
+
+                // Normal timer process.
+                Timer: () => Light.next(light),
+
+                // Ambulance can trigger Green -> Red manually
+                Ambulance: () => S.run(
+                    light,
+                    Light.fold({
+                        Red: Light.Red,
+                        Green: Light.Yellow,
+                        Yellow: Light.Yellow
+                    })
+                )
+            })
+            , light => R.assocPath(['light'], light)
+        )
+    )
+
+    setInterval(
+        () => action$( Action.Timer() )
+        , 5000
+    )
+
+    return out$
+}
+const lightAction$ = m.stream()
+
+LightService(getState$, lightAction$)
+    .map( setState$ )
+
+So meiosis services were state machines all along :)
+
+So back to the question - for the routing fetching example - do I need to fetch
+data when the route changes? Or do I need to fetch data when it's potentially
+stale or out of context. Route changing is often incidental to that
+relationship of staleness. We could potentially have many inputs into which app
+states define whether or not data is required and/or stale. If we think in
+terms of transitions we'll write the same code many places when we want to
+update the data for different reasons, but if we think in terms of
+relationships, the transition logic can observe when the normalized
+relationship differs and trigger the require synchronization logic. And streams
+(mithril streams included) are really good at modelling relationships and
+subscribing to them.
+
+The route transition is probably not central to the data needing to be fetched,
+rather the data has a defined relationship with the app/user's expectations
+of refresh rates and context. And those relationship's are a local concern,
+modelling the transitions based on the state of those relationships is a
+global concern.
+
+So if I have a todo app, I should only see my settings data if I am on the
+settings page. That is a relationship. And if I am on the main todo page, I
+should see my tasks.
+
+We could say, _when_ I navigate to /settings, fetch my user settings data. Or
+we can say, settings data is active when the current route is /settings. These
+mental models are subtlely different, one is imperative: do this when that
+changes; the other is declarative: this is defined by these inputs.
+
+That turns our discrete model into a continous model. E.g. instead of a series
+of events plotted when the route changes, we have a continous graph where
+settings data will either be active or inactive. That question can be asked for
+any time t and there will always be an answer (active or inactive).
+
+Elsewhere we can say (potentially globally in a service), if any data is
+active, but hasn't been fetched since the last route change or a delta maximum,
+fetch it from the appropriate location.
+
+const Active = S.either('Active')
+
+const init = () => ({
+    route: Route.Settings(),
+    tasks: Active.N(),
+    settings: Active.N()
+})
+
+// watches state, fetches data based on Active changing
+// does not change Active itself
+activeService(getState)
+    .map(setState)
+
+// Changes task's active status based on relationships in state
+// Does not fetch data
+taskActiveService(getState)
+    .map(setState)
+
+// Changes settings's active status based on relationships in state
+// Does not fetch data
+settingsActiveService(getState)
+    .map(setState)
+
+Now if we want to see settings data in two places, or three places or based on
+additional predicates, we adjust that is relationship settings data is active
+when the current route is /settings or /admin. And our global service fulfills
+that continuous relationship by triggering discrete actions like network
+requests without needing to know the local concerns of what makes data active
+or not.
+
+That relationship service is really easy to write:
+
+route.map(
+    // Route's are stags sum types too :)
+    // Active if the Route is Settings
+    Route.getSettingsWith( Active.N(), Active.Y )
+)
+.map(
+    // Dispatch a function that
+    // places our Active.N() or Active.Y() to state.settings
+    R.assocPath(['settings'])
+)
+// Actually modify the state
+.map( setState )
+
+It's a lot like a SQL query. We say, what the relationship is between 3 or 4
+tables and the query planner decides how to resolve those relationships
+efficiently. Those relationships are dictated locally in our query, but the
+resolution of queries generally is a hidden and global concern within the
+database.
+
+The postgres/mysql/etc devs can test their query planner in isolation of your
+business logic queries. And you can test your queries in isolation of the query
+planner. This is part of why SQL, CSS, Excel and other declarative languages
+are so easy to pick up. The state synchronization and transitions are automated
+away.
+
+Same is true for UI transitions and state synchronization.
+
+Another example you gave was guarding a route based on user permissioning. I
+see that as a relationship.
+
+We can say, the list of possible routes is [A,B,C,D] when user is admin and the
+list of possible routes if [A,D] when the user is not an admin.
+
+That means if I try to route to C when I'm not an admin, it's not possible
+because that relationship dictated it doesn't exist for me as an accessible
+route.
+
+It's a lot like a style not applying when a css selector doesn't apply to an
+element. Or a row disappearing when a predicate on a join wasn't satisfied.
+
+The services would like the same:
+
+fold over the sum type(s) that dictates the relationships, update our state.
+
+Watch for that class of state changing and perform side
+effects/transitions/synchronization as a result.
+
+There needs to be a router service that accepts some relationship data and
+manually redirects to a default route or a login page or whatever based on
+those relationships and the user's current level of access. But that system is
+isolated from the application / component level logic which simply deals with
+input, relationships and rendering.
+
+The distinct route transition system is just accepting an acl, the current
+route state, and the current user state and making some global determination on
+what to do in that scenario. It doesn't have specific case by case logic that
+is hand written and coupled to a particular route.
+
+I think this distinction between continuous functions in the core of our app,
+and state machines/services at the edges, is super valuable because we can
+test our UI code by checking the data changes state from Active / Inactive at
+the approriate times. And we can test our service code by checking network
+requests fire, or local storage is stored etc at the appropriate times. And
+there's a clear distinction between IO and Discrete events. So the lionshare
+of our app is pure and readily testable as data transforms.
+
+I think in some ways these ideas are really old, but in other respects, in the
+context of web apps it's still pretty new or at least under explored. We're
+only just starting to see the mainstream adoption of observables/streams. And
+sum-types are everywhere in mainstream UI programming but the recogition of
+that fact is still uncommon. I think these two tools are the most important and
+powerful we have for this problem domain, and it's very to me exciting how much
+territory there is to explore here.
+
+Just re-reading and seeing all kinds of typos, most important error is that
+meiosis service.
+
+m.stream.merge([light$, action$]).map(...)
+
+is never returned, so it has no connection to .map(setState). Should be
+
+const out = m.stream.merge([light$, action$]).map(
+
+Or return m.stream.merge([light$, action$]).map(...)
+
