@@ -32,13 +32,12 @@ const validateRange = state => () => withinRange(state.currentTime)(state.player
   ? null
   : { playerState: PlayerState.Stopped() }
 
-const rangeService = ({ state }) => {
-  if (state.currentTime < 0) {
-    return { currentTime: 0 }
-  }
-
-  if (state.currentTime > MAX_TIME) {
-    return { currentTime: MAX_TIME }
+const acceptService = ({ state, previousState, patch }) => {
+  if (patch && patch.currentTime &&
+       (PlayerState.isStopped(state.playerState) ||
+        PlayerState.isPaused(state.playerState)))
+  {
+    return { currentTime: previousState.currentTime }
   }
 }
 
@@ -125,7 +124,12 @@ const initial = {
   playerState: PlayerState.Stopped()
 }
 
-const app = { initial, Actions, services: [rangeService, stateService], effects: [effect] }
+const app = {
+  initial,
+  Actions,
+  services: [acceptService, stateService],
+  effects: [effect]
+}
 
 const { states, actions } =
   meiosisMergerino({ stream: simpleStream, merge, app })
