@@ -32,15 +32,18 @@ const validateRange = state => () => withinRange(state.currentTime)(state.player
   ? null
   : { playerState: PlayerState.Stopped() }
 
-const service = ({ state, previousState }) => {
-  if (previousState
-    && previousState.playerState.tag === "Stopped"
-    && state.currentTime !== previousState.currentTime) {
-
-    return { currentTime: previousState.currentTime }
+const rangeService = ({ state }) => {
+  if (state.currentTime < 0) {
+    return { currentTime: 0 }
   }
 
-  return run(
+  if (state.currentTime > MAX_TIME) {
+    return { currentTime: MAX_TIME }
+  }
+}
+
+const stateService = ({ state }) =>
+  run(
     state.playerState,
     PlayerState.fold({
       Stopped: K(null),
@@ -50,7 +53,6 @@ const service = ({ state, previousState }) => {
       FastForwarding: validateRange(state)
     })
   )
-}
 
 const effect = ({ state, update }) => {
   const within = withinRange(state.currentTime)(state.playerState)
@@ -123,7 +125,7 @@ const initial = {
   playerState: PlayerState.Stopped()
 }
 
-const app = { initial, Actions, services: [service], effects: [effect] }
+const app = { initial, Actions, services: [rangeService, stateService], effects: [effect] }
 
 const { states, actions } =
   meiosisMergerino({ stream: simpleStream, merge, app })
@@ -192,7 +194,10 @@ export default class extends React.Component {
 
     return (
       <Card>
-        <h2>{state.currentTime}</h2>
+        <div style={{display: "flex", justifyContent: "space-between", fontSize: "24px"}}>
+          <span>{state.currentTime}</span>
+          <span>{state.playerState.case}</span>
+        </div>
         <Flex mb={3} bg="shade" sx={{ justifyContent: "center", borderRadius: 3 }}>
           <Wheel progress={progress} speed={speed} />
           <Wheel progress={1 - progress} speed={speed} />
@@ -234,7 +239,7 @@ export default class extends React.Component {
           Original example credit: Steve Ruiz @steveruizok
         </div>
         <div>
-          <a href="https://codesandbox.io/s/state-designer-counter-2nmd5">Codesandbox example</a>
+          <a href="https://codesandbox.io/s/state-designer-counter-2nmd5">Codesandbox</a>
         </div>
       </Card>
     )
