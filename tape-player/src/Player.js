@@ -88,10 +88,10 @@ const Actions = update => ({
   stop: () => update({ playerState: PlayerState.Stopped() }),
   play: () => update({ playerState: PlayerState.Playing() }),
   pause: () => update({ playerState: PlayerState.Paused() }),
-  rewind: () => update({ playerState: PlayerState.Rewinding({ delay: 100 }) }),
-  fastForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 100 }) }),
-  scrubBack: () => update({ playerState: PlayerState.Rewinding({ delay: 50 }) }),
-  scrubForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 50 }) })
+  rewind: () => update({ playerState: PlayerState.Rewinding({ delay: 100, scrubbing: false }) }),
+  fastForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 100, scrubbing: false }) }),
+  scrubBack: () => update({ playerState: PlayerState.Rewinding({ delay: 50, scrubbing: true }) }),
+  scrubForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 50, scrubbing: true }) })
 })
 
 const computeEnabled = state =>
@@ -121,7 +121,7 @@ const computeEnabled = state =>
       }),
       Rewinding: () => ({
         play: state.currentTime < MAX_TIME,
-        rewind: false,
+        rewind: true, // FIXME
         fastForward: state.currentTime < MAX_TIME,
         stop: true,
         pause: false
@@ -214,11 +214,13 @@ export default class extends React.Component {
     const enabled = computeEnabled(state)
 
     const rewindEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubBack(), onMouseUp: () => actions.pause() }
+      ? { onMouseDown: () => actions.scrubBack() }
+      : PlayerState.isRewinding(state.playerState) // FIXME
+      ? { onMouseUp: () => actions.pause() }
       : { onClick: () => actions.rewind() }
 
     const fastForwardEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubForward(), onMouseUp: () => actions.pause() }
+      ? { onMouseDown: () => actions.scrubForward() }
       : { onClick: () => actions.fastForward() }
 
     return (
