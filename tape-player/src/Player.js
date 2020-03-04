@@ -66,8 +66,8 @@ const computeDelay = PlayerState.fold({
   Stopped: K(0),
   Playing: K(1000),
   Paused: K(0),
-  Rewinding: x => -x,
-  FastForwarding: I
+  Rewinding: ({ delay }) => -delay,
+  FastForwarding: ({ delay }) => delay
 })
 
 const effect = ({ state, update }) => {
@@ -88,10 +88,10 @@ const Actions = update => ({
   stop: () => update({ playerState: PlayerState.Stopped() }),
   play: () => update({ playerState: PlayerState.Playing() }),
   pause: () => update({ playerState: PlayerState.Paused() }),
-  rewind: () => update({ playerState: PlayerState.Rewinding(50) }),
-  fastForward: () => update({ playerState: PlayerState.FastForwarding(50) }),
-  scrubBack: () => update({ playerState: PlayerState.Rewinding(100) }),
-  scrubForward: () => update({ playerState: PlayerState.FastForwarding(100) })
+  rewind: () => update({ playerState: PlayerState.Rewinding({ delay: 100 }) }),
+  fastForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 100 }) }),
+  scrubBack: () => update({ playerState: PlayerState.Rewinding({ delay: 50 }) }),
+  scrubForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 50 }) })
 })
 
 const computeEnabled = state =>
@@ -213,6 +213,14 @@ export default class extends React.Component {
     const speed = Math.abs(computeDelay(state.playerState) / 1000)
     const enabled = computeEnabled(state)
 
+    const rewindEvents = PlayerState.isPaused(state.playerState)
+      ? { onMouseDown: () => actions.scrubBack(), onMouseUp: () => actions.pause() }
+      : { onClick: () => actions.rewind() }
+
+    const fastForwardEvents = PlayerState.isPaused(state.playerState)
+      ? { onMouseDown: () => actions.scrubForward(), onMouseUp: () => actions.pause() }
+      : { onClick: () => actions.fastForward() }
+
     return (
       <Card>
         <div style={{display: "flex", justifyContent: "space-between", fontSize: "24px"}}>
@@ -228,22 +236,10 @@ export default class extends React.Component {
             events={{ onClick: () => actions.play() }}>
             <Play />
           </EventButton>
-          <EventButton enabled={enabled} type="rewind"
-            events={{
-              // onMouseDown: "HELD_REWIND",
-              // onMouseUp: "RELEASED_REWIND",
-              onClick: () => actions.rewind()
-            }}
-          >
+          <EventButton enabled={enabled} type="rewind" events={rewindEvents}>
             <Rewind />
           </EventButton>
-          <EventButton enabled={enabled} type="fastForward"
-            events={{
-              // onMouseDown: "HELD_FASTFORWARD",
-              // onMouseUp: "RELEASED_FASTFORWARD",
-              onClick: () => actions.fastForward()
-            }}
-          >
+          <EventButton enabled={enabled} type="fastForward" events={fastForwardEvents}>
             <FastForward />
           </EventButton>
           <EventButton enabled={enabled} type="stop"
