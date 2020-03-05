@@ -3,13 +3,12 @@
 import { jsx, Box, Card, Grid, Flex, Button } from "theme-ui"
 import { Rewind, FastForward, Play, Square, Pause } from "react-feather"
 import { motion, transform } from "framer-motion"
-import { run, tags } from "stags"
+import { otherwise, run, tags } from "stags"
 import merge from "mergerino"
 import meiosisMergerino from "meiosis-setup/mergerino"
 import simpleStream from "meiosis-setup/simple-stream"
 import React from "react"
 
-const I = x => x
 const K = x => () => x
 
 const MAX_TIME = 30
@@ -19,8 +18,30 @@ const PlayerState = tags("PlayerState", [
   "Playing",
   "Paused",
   "Rewinding",
-  "FastForwarding"
+  "ScrubbingBack",
+  "FastForwarding",
+  "ScrubbingForward"
 ])
+
+const allStates = otherwise([
+  "Stopped",
+  "Playing",
+  "Paused",
+  "Rewinding",
+  "ScrubbingBack",
+  "FastForwarding",
+  "ScrubbingForward"
+])
+
+const getLabel = PlayerState.fold({
+  Stopped: K("Stopped"),
+  Playing: K("Playing"),
+  Paused: K("Paused"),
+  Rewinding: K("Rewind"),
+  ScrubbingBack: K("Scrub Back"),
+  FastForwarding: K("Fast Forward"),
+  ScrubbingForward: K("Scrub Forward")
+})
 
 // This "accepts" a patch to update the current time.
 // While playing, the effect triggers a currentTime update after a delay.
@@ -37,11 +58,9 @@ const acceptService = ({ state, previousState, patch }) => {
 }
 
 const withinRange = t => PlayerState.fold({
-  Stopped: K(false),
-  Playing: () => t < MAX_TIME,
-  Paused: K(false),
-  Rewinding: () => t > 0,
-  FastForwarding: () => t < MAX_TIME
+  ...otherwise(["Stopped", "Paused"])(K(false)),
+  ...otherwise(["Rewinding", "ScrubbingBack"])(() => t > 0),
+  ...otherwise(["Playing", "FastForwarding", "ScrubbingForward"])(() => t < MAX_TIME)
 })
 
 const validateRange = state => () => withinRange(state.currentTime)(state.playerState)
@@ -49,16 +68,13 @@ const validateRange = state => () => withinRange(state.currentTime)(state.player
   : { playerState: PlayerState.Stopped() }
 
 // This determines whether the next state should be Stopped, which is if we are "moving"
-// (Playing, Rewinding, FastForwarding), and have reached the end (or beginning) of the tape.
+// (Playing, Rewinding, FastForwarding, etc.), and have reached the end (or beginning) of the tape.
 const stateService = ({ state }) =>
   run(
     state.playerState,
     PlayerState.fold({
-      Stopped: K(null),
-      Playing: validateRange(state),
-      Paused: K(null),
-      Rewinding: validateRange(state),
-      FastForwarding: validateRange(state)
+      ...allStates(validateRange(state)),
+      ...otherwise(["Stopped", "Paused"])(K(null)),
     })
   )
 
@@ -66,8 +82,10 @@ const computeDelay = PlayerState.fold({
   Stopped: K(0),
   Playing: K(1000),
   Paused: K(0),
-  Rewinding: ({ delay }) => -delay,
-  FastForwarding: ({ delay }) => delay
+  Rewinding: K(-50),
+  ScrubbingBack: K(-75),
+  FastForwarding: K(50),
+  ScrubbingForward: K(75)
 })
 
 const effect = ({ state, update }) => {
@@ -88,53 +106,41 @@ const Actions = update => ({
   stop: () => update({ playerState: PlayerState.Stopped() }),
   play: () => update({ playerState: PlayerState.Playing() }),
   pause: () => update({ playerState: PlayerState.Paused() }),
-  rewind: () => update({ playerState: PlayerState.Rewinding({ delay: 100, scrubbing: false }) }),
-  fastForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 100, scrubbing: false }) }),
-  scrubBack: () => update({ playerState: PlayerState.Rewinding({ delay: 50, scrubbing: true }) }),
-  scrubForward: () => update({ playerState: PlayerState.FastForwarding({ delay: 50, scrubbing: true }) })
+  rewind: () => update({ playerState: PlayerState.Rewinding() }),
+  scrubBack: () => update({ playerState: PlayerState.ScrubbingBack() }),
+  fastForward: () => update({ playerState: PlayerState.FastForwarding() }),
+  scrubForward: () => update({ playerState: PlayerState.ScrubbingForward() })
 })
 
-const computeEnabled = state =>
-  run(
-    state.playerState,
-    PlayerState.fold({
-      Stopped: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: false,
-        pause: false
-      }),
-      Playing: () => ({
-        play: false,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: true,
-        pause: true
-      }),
-      Paused: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: state.currentTime < MAX_TIME,
-        stop: false,
-        pause: false
-      }),
-      Rewinding: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: true, // FIXME
-        fastForward: state.currentTime < MAX_TIME,
-        stop: true,
-        pause: false
-      }),
-      FastForwarding: () => ({
-        play: state.currentTime < MAX_TIME,
-        rewind: state.currentTime > 0,
-        fastForward: false,
-        stop: true,
-        pause: false
-      })
-    })
-  )
+const canPlay = state => run(state.playerState, PlayerState.fold({
+  ...allStates(() => state.currentTime < MAX_TIME),
+  Playing: K(false)
+}))
+
+const canRewind = state => run(state.playerState, PlayerState.fold({
+  ...allStates(() => state.currentTime > 0),
+  Rewinding: K(false),
+  ScrubbingBack: K(true)
+}))
+
+const canFastForward = state => run(state.playerState, PlayerState.fold({
+  ...allStates(() => state.currentTime < MAX_TIME),
+  FastForwarding: K(false),
+  ScrubbingForward: K(true)
+}))
+
+const canStop = state => run(state.playerState, PlayerState.fold({
+  ...otherwise(["Stopped", "Paused", "ScrubbingBack", "ScrubbingForward"])(K(false)),
+  ...otherwise(["Playing", "Rewinding", "FastForwarding"])(K(true))
+}))
+
+const computeEnabled = state => ({
+  play: canPlay(state),
+  rewind: canRewind(state),
+  fastForward: canFastForward(state),
+  stop: canStop(state),
+  pause: canStop(state)
+})
 
 const initial = {
   currentTime: 0,
@@ -150,6 +156,23 @@ const app = {
 
 const { states, actions } =
   meiosisMergerino({ stream: simpleStream, merge, app })
+
+const accelerateEvents = {
+  rewind: {
+    onClick: () => actions.rewind()
+  },
+  scrubBack: {
+    onMouseDown: () => actions.scrubBack(),
+    onMouseUp: () => actions.pause()
+  },
+  fastForward: {
+    onClick: () => actions.fastForward(),
+  },
+  scrubForward: {
+    onMouseDown: () => actions.scrubForward(),
+    onMouseUp: () => actions.pause()
+  }
+}
 
 function EventButton({ enabled, type, events, children }) {
   const isDisabled = !enabled[type]
@@ -213,21 +236,21 @@ export default class extends React.Component {
     const speed = Math.abs(computeDelay(state.playerState) / 1000)
     const enabled = computeEnabled(state)
 
-    const rewindEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubBack() }
-      : PlayerState.isRewinding(state.playerState) // FIXME
-      ? { onMouseUp: () => actions.pause() }
-      : { onClick: () => actions.rewind() }
+    const rewindEvents = run(state.playerState, PlayerState.fold({
+      ...allStates(K(accelerateEvents.rewind)),
+      ...otherwise(["Paused", "ScrubbingBack"])(K(accelerateEvents.scrubBack))
+    }))
 
-    const fastForwardEvents = PlayerState.isPaused(state.playerState)
-      ? { onMouseDown: () => actions.scrubForward() }
-      : { onClick: () => actions.fastForward() }
+    const fastForwardEvents = run(state.playerState, PlayerState.fold({
+      ...allStates(K(accelerateEvents.fastForward)),
+      ...otherwise(["Paused", "ScrubbingForward"])(K(accelerateEvents.scrubForward))
+    }))
 
     return (
       <Card>
         <div style={{display: "flex", justifyContent: "space-between", fontSize: "24px"}}>
           <span>{state.currentTime}</span>
-          <span>{state.playerState.case}</span>
+          <span>{getLabel(state.playerState)}</span>
         </div>
         <Flex mb={3} bg="shade" sx={{ justifyContent: "center", borderRadius: 3 }}>
           <Wheel progress={progress} speed={speed} />
