@@ -1,4 +1,5 @@
 // Original example credit: Steve Ruiz @steveruizok https://codesandbox.io/s/state-designer-counter-2nmd5
+// With many thanks to James Forbes http://james-forbes.com/
 /** @jsx jsx */
 import { jsx, Box, Card, Grid, Flex, Button } from "theme-ui"
 import { Rewind, FastForward, Play, Square, Pause } from "react-feather"
