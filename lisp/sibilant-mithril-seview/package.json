@@ -9,14 +9,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "crocks": "^0.10.1",
-    "mithril": "^1.1.6",
-    "mithril-stream": "^1.1.0",
-    "patchinko": "^3.2.1",
-    "seview": "^0.10.0"
+    "crocks": "^0.12.4",
+    "mithril": "^2.0.4",
+    "mithril-stream": "^2.0.0",
+    "patchinko": "^4.2.0",
+    "seview": "^1.0.1"
   },
   "devDependencies": {
-    "browserify": "^16.2.2",
-    "sibilant": "^0.5.5"
+    "browserify": "^16.5.1",
+    "sibilant": "^0.5.6"
   }
 }
