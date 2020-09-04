@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "mithril": "^1.1.6",
+    "mithril": "^1.1.7",
     "mithril-stream": "^1.1.0"
   },
   "devDependencies": {
